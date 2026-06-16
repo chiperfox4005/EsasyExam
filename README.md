@@ -1,58 +1,243 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# EsasyExam
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+EsasyExam is a web-based examination and learning management platform designed to support digital assessment, question bank management, and AI-assisted content generation in educational environments.
 
-## About Laravel
+The system is built to simplify exam creation, improve question organization, and provide scalable learning workflows for administrators, teachers, and students.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Overview
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+EsasyExam provides an integrated environment where educational institutions can manage subjects, users, examinations, and learning activities through a modern and responsive interface.
 
-## Learning Laravel
+The platform focuses on:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+* Centralized question bank management
+* Examination creation and distribution
+* AI-assisted question generation
+* Student learning support
+* Administrative academic management
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Core Features
 
-## Agentic Development
+### Authentication & Role Management
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Supports multiple user roles:
 
-```bash
-composer require laravel/boost --dev
+* Administrator
+* Teacher
+* Student
 
-php artisan boost:install
+Each role has dedicated access permissions and dashboards.
+
+---
+
+### Dashboard System
+
+#### Administrator Dashboard
+
+* Manage classes
+* Manage teachers
+* Manage students
+* Manage subjects
+* Monitor examinations
+
+#### Teacher Dashboard
+
+* Create and manage question banks
+* Import questions via Excel
+* Generate questions using AI
+* Build examinations
+* Publish and maintain assessments
+
+#### Student Dashboard
+
+* Access learning materials
+* Participate in examinations
+* Track learning progress
+
+---
+
+### Question Bank
+
+Question management includes:
+
+* Multiple choice questions
+* Essay questions
+* Question categorization by subject
+* Difficulty levels
+* Draft and publish workflow
+* Image support
+* Search and filtering
+* Excel import/export
+
+---
+
+### Examination Module
+
+Capabilities include:
+
+* Exam creation
+* Subject-based question selection
+* Automatic distribution
+* Answer submission
+* Result tracking
+
+---
+
+### AI Question Generator
+
+Integrated AI functionality enables:
+
+* Automatic question generation
+* Subject-based content generation
+* Editable generated output
+* Save generated questions directly into the question bank
+
+---
+
+## Technology Stack
+
+### Backend
+
+* Laravel 13
+* PHP 8.3
+
+### Frontend
+
+* Blade
+* Tailwind CSS
+* Alpine.js
+* Font Awesome
+
+### Database
+
+* MySQL
+
+### Additional Tools
+
+* Laravel Vite
+* PhpSpreadsheet
+* Laravel Excel
+
+---
+
+## Project Structure
+
+```plaintext
+app/
+resources/
+routes/
+public/
+database/
+storage/
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## Installation
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Clone repository:
 
-## Code of Conduct
+```bash
+git clone https://github.com/chiperfox4005/EsasyExam.git
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Enter project directory:
 
-## Security Vulnerabilities
+```bash
+cd EsasyExam
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Install dependencies:
+
+```bash
+composer install
+npm install
+```
+
+Create environment:
+
+```bash
+cp .env.example .env
+```
+
+Generate application key:
+
+```bash
+php artisan key:generate
+```
+
+Configure database inside `.env`.
+
+Run migration:
+
+```bash
+php artisan migrate
+```
+
+Build frontend:
+
+```bash
+npm run build
+```
+
+Start development server:
+
+```bash
+php artisan serve
+```
+
+---
+
+## Development Commands
+
+Run development environment:
+
+```bash
+npm run dev
+```
+
+Clear cache:
+
+```bash
+php artisan optimize:clear
+```
+
+Run migrations:
+
+```bash
+php artisan migrate
+```
+
+---
+
+## Repository
+
+GitHub Repository:
+
+https://github.com/chiperfox4005/EsasyExam
+
+---
+
+## Roadmap
+
+Planned improvements:
+
+* Learning analytics
+* AI performance recommendations
+* Gamification system
+* Student leaderboard
+* Badge system
+* Real-time monitoring
+* Mobile optimization
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is developed for educational and research purposes.
+
+All rights reserved.
