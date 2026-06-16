@@ -1,144 +1,115 @@
 # EsasyExam
 
-EsasyExam is a modern web-based examination and learning platform designed to streamline academic assessment, question management, and digital learning experiences.
+EsasyExam is a web-based examination and digital learning platform designed to simplify academic assessment, question management, and educational workflows through a modern and scalable architecture.
 
-Built using Laravel and modern web technologies, EsasyExam provides an integrated environment for administrators, teachers, and students to manage educational activities efficiently through a centralized system.
-
----
-
-## Introduction
-
-Educational institutions increasingly require flexible and scalable systems to support examinations, learning processes, and content management.
-
-EsasyExam addresses these needs by combining:
-
-* Examination management
-* Centralized question banks
-* AI-assisted question generation
-* Learning support tools
-* User role separation
-* Responsive and modern user interfaces
-
-The platform is designed with extensibility in mind to support future educational innovations.
+The system combines examination management, centralized question banks, AI-assisted content generation, and role-based learning experiences into a unified educational environment.
 
 ---
 
-## Key Capabilities
+## Application Preview
 
-### User & Access Management
+The following screenshot represents the current development interface of EsasyExam.
 
-Role-based architecture ensures controlled access across the system.
+![EsasyExam Preview](https://github.com/chiperfox4005/EsasyExam/blob/main/screencapture-127-0-0-1-8000-2026-06-16-23_01_04.png?raw=true)
 
-Supported roles:
+---
+
+## Overview
+
+EsasyExam provides an integrated environment where institutions can manage:
+
+* Subjects and curriculum
+* Question banks
+* Digital examinations
+* Learning activities
+* Student progress
+* AI-assisted educational content
+
+---
+
+## Main Features
+
+### Authentication & Authorization
+
+Role-based access control:
 
 * Administrator
 * Teacher
 * Student
 
-Each role receives dedicated dashboards and feature access.
+---
+
+### Administrator Features
+
+* Manage classes
+* Manage teachers
+* Manage students
+* Manage subjects
+* Monitor examinations
 
 ---
 
-## Administration Module
+### Teacher Features
 
-Administrator capabilities include:
-
-* Manage academic classes
-* Manage teacher accounts
-* Manage student accounts
-* Organize subjects
-* Supervise examinations
-* Monitor platform usage
-
----
-
-## Teacher Workspace
-
-Teachers can:
-
-* Build and manage question banks
-* Create multiple-choice and essay questions
-* Upload question images
-* Categorize questions by subject and difficulty
-* Import questions from Excel
+* Create question banks
+* Import Excel questions
 * Generate questions using AI
-* Create and publish examinations
+* Create examinations
+* Publish assessments
+* Manage images in questions
 
 ---
 
-## Student Experience
-
-Students can:
+### Student Features
 
 * Access learning modules
-* Join examinations
-* Submit answers digitally
-* Review examination results
-* Track learning progress
+* Participate in examinations
+* View examination results
+* Monitor learning progress
 
 ---
 
-## Question Bank System
+### Question Bank
 
-Question management supports:
+Supported capabilities:
 
 * Multiple Choice Questions
 * Essay Questions
-* Question difficulty classification
-* Draft and publish workflow
-* Search and filtering
-* Image attachments
-* Excel import support
-* AI-generated content
+* Image Support
+* Question Difficulty Levels
+* Draft & Publish Workflow
+* Search & Filter
+* Import from Excel
+* AI Generated Questions
 
 ---
 
-## Examination System
+### Examination System
 
-Core examination features:
-
-* Exam scheduling
-* Subject-based question selection
-* Automatic question loading
-* Student answer collection
-* Result processing
-
----
-
-## AI Question Generation
-
-EsasyExam integrates AI-assisted workflows that enable:
-
-* Automatic question creation
-* Subject-aware generation
-* Editable generated outputs
-* Direct saving into question banks
+* Examination creation
+* Question distribution
+* Answer submission
+* Result evaluation
+* Performance tracking
 
 ---
 
 ## Technology Stack
 
-### Backend
-
-* Laravel 13
-* PHP 8.3
-
-### Frontend
-
-* Blade
-* Tailwind CSS
-* Alpine.js
-* Font Awesome
-
-### Database
-
-* MySQL
-
-### Additional Packages
-
-* Laravel Vite
-* Laravel Excel
-* PhpSpreadsheet
+| Layer              | Technology     |
+| ------------------ | -------------- |
+| Backend            | Laravel 13     |
+| Language           | PHP 8.3        |
+| Frontend           | Blade          |
+| Styling            | Tailwind CSS   |
+| Interactivity      | Alpine.js      |
+| Icons              | Font Awesome   |
+| Database           | MySQL          |
+| Asset Build        | Laravel Vite   |
+| Excel Processing   | Laravel Excel  |
+| Spreadsheet Engine | PhpSpreadsheet |
+| Version Control    | Git            |
+| Repository         | GitHub         |
 
 ---
 
@@ -165,25 +136,20 @@ Clone repository:
 git clone https://github.com/chiperfox4005/EsasyExam.git
 ```
 
-Enter project directory:
+Move into project:
 
 ```bash
 cd EsasyExam
 ```
 
-Install backend dependencies:
+Install dependencies:
 
 ```bash
 composer install
-```
-
-Install frontend dependencies:
-
-```bash
 npm install
 ```
 
-Create environment file:
+Create environment:
 
 ```bash
 cp .env.example .env
@@ -195,21 +161,27 @@ Generate application key:
 php artisan key:generate
 ```
 
-Configure database credentials inside `.env`.
+Configure database:
 
-Run database migration:
+```env
+DB_DATABASE=
+DB_USERNAME=
+DB_PASSWORD=
+```
+
+Run migration:
 
 ```bash
 php artisan migrate
 ```
 
-Build frontend assets:
+Build assets:
 
 ```bash
 npm run build
 ```
 
-Start development server:
+Run application:
 
 ```bash
 php artisan serve
@@ -219,7 +191,7 @@ php artisan serve
 
 ## Development Commands
 
-Development server:
+Start frontend:
 
 ```bash
 npm run dev
@@ -231,7 +203,7 @@ Clear cache:
 php artisan optimize:clear
 ```
 
-Run migrations:
+Run migration:
 
 ```bash
 php artisan migrate
@@ -247,22 +219,22 @@ https://github.com/chiperfox4005/EsasyExam
 
 ---
 
-## Future Development
+## Development Roadmap
 
-Planned enhancements:
+Future improvements:
 
 * Learning analytics
-* AI-based student recommendations
-* Gamification features
+* AI recommendation system
+* Gamification
 * Badge system
 * Leaderboards
 * Real-time monitoring
-* Mobile responsiveness improvements
+* Mobile optimization
 
 ---
 
 ## License
 
-This project is developed for educational and research purposes.
+Developed for educational and research purposes.
 
 © FikryTech — All Rights Reserved.
