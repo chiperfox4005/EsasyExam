@@ -6,14 +6,17 @@ use App\Models\MataPelajaran;
 use App\Models\Kelas;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;  // ✅ TAMBAHKAN INI!
+use Illuminate\Support\Facades\Auth;
 
 class MapelController extends Controller
 {
     public function index()
     {
-        // ✅ AMBIL MAPEL MILIK GURU YANG LOGIN
-        $mapelList = MataPelajaran::where('guru_id', Auth::id())
+        // ✅ TAMPILKAN: Mapel milik guru + Mapel global (guru_id NULL)
+        $mapelList = MataPelajaran::where(function($query) {
+                $query->where('guru_id', Auth::id())
+                      ->orWhereNull('guru_id');
+            })
             ->orderBy('nama')
             ->paginate(10);
         
@@ -24,7 +27,6 @@ class MapelController extends Controller
     {
         $kelasList = Kelas::all();
         $gurus = User::where('role', 'guru')->get();
-
         return view('mapel.create', compact('kelasList', 'gurus'));
     }
 
@@ -53,7 +55,12 @@ class MapelController extends Controller
 
     public function edit($id)
     {
-        $mapel = MataPelajaran::findOrFail($id);
+        // ✅ CEK: Hanya bisa edit mapel milik sendiri atau global
+        $mapel = MataPelajaran::where(function($query) {
+                $query->where('guru_id', Auth::id())
+                      ->orWhereNull('guru_id');
+            })->findOrFail($id);
+        
         $kelasList = Kelas::all();
         $gurus = User::where('role', 'guru')->get();
 
@@ -62,6 +69,11 @@ class MapelController extends Controller
 
     public function update(Request $request, $id)
     {
+        $mapel = MataPelajaran::where(function($query) {
+                $query->where('guru_id', Auth::id())
+                      ->orWhereNull('guru_id');
+            })->findOrFail($id);
+        
         $request->validate([
             'nama' => 'required|string|max:255',
             'kode' => 'required|string|max:50|unique:mata_pelajarans,kode,' . $id,
@@ -71,7 +83,6 @@ class MapelController extends Controller
             'guru_id' => 'nullable|exists:users,id',
         ]);
 
-        $mapel = MataPelajaran::findOrFail($id);
         $mapel->update([
             'nama' => $request->nama,
             'kode' => $request->kode,
@@ -86,7 +97,13 @@ class MapelController extends Controller
 
     public function destroy($id)
     {
-        MataPelajaran::findOrFail($id)->delete();
+        // ✅ CEK: Hanya bisa hapus mapel milik sendiri atau global
+        $mapel = MataPelajaran::where(function($query) {
+                $query->where('guru_id', Auth::id())
+                      ->orWhereNull('guru_id');
+            })->findOrFail($id);
+        
+        $mapel->delete();
         return redirect()->route('mapel.index')->with('success', 'Mata pelajaran berhasil dihapus!');
     }
 }

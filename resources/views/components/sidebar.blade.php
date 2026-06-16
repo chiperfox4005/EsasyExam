@@ -4,27 +4,19 @@
 >
     <div class="flex flex-col h-full">
 
-        {{-- HEADER --}}
-        <div class="flex items-center gap-3 px-6 py-6 border-b border-gray-100">
-
-            <div class="w-10 h-10 gradient-primary rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <i class="fas fa-graduation-cap text-white text-lg"></i>
-            </div>
-
+        {{-- ================= HEADER (SESUDAH) ================= --}}
+        <div class="flex items-center gap-4 px-6 py-6 border-b border-gray-100">
+            <img src="{{ asset('images/logo/esasyexam-logo.png') }}" 
+                 alt="EsasyExam" 
+                 class="w-16 h-16 object-contain drop-shadow-md">
             <div>
-                <h1 class="text-xl font-bold text-gray-900">
-                    EsasyExam
-                </h1>
-
-                <p class="text-xs text-gray-500">
-                    Smart Learning
-                </p>
+                <h1 class="text-2xl font-bold text-gray-900">EsasyExam</h1>
+                <p class="text-sm text-gray-500">Smart Learning</p>
             </div>
-
         </div>
 
 
-        {{-- MENU --}}
+        {{-- ================= MENU ================= --}}
         <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
 
             @php
@@ -94,12 +86,20 @@
                     <span class="font-medium">Bank Soal</span>
                 </a>
 
-                {{-- AI GENERATE (MENU BARU) --}}
+                {{-- AI GENERATE --}}
                 <a href="{{ route('ai-generate.index') }}" 
                     class="flex items-center gap-3 px-4 py-3 rounded-2xl {{ request()->routeIs('ai-generate.*') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50' }} transition-all duration-200">
                     <i class="fas fa-robot w-5"></i>
                     <span class="font-medium">AI Generate</span>
                     <span class="ml-auto px-2 py-0.5 text-xs bg-purple-500 text-white rounded-full font-semibold">NEW</span>
+                </a>
+
+                {{-- PAKET LATIHAN --}}
+                <a href="{{ route('guru.paket-latihan.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl {{ request()->routeIs('guru.paket-latihan.*') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50' }} transition-all duration-200">
+                    <i class="fas fa-box-open w-5"></i>
+                    <span class="font-medium">Paket Latihan</span>
+                    <span class="ml-auto px-2 py-0.5 text-xs bg-emerald-500 text-white rounded-full font-semibold">NEW</span>
                 </a>
 
                 <a href="{{ route('ujian.index') }}"
@@ -123,27 +123,35 @@
                     <i class="fas fa-book-reader w-5"></i>
                     <span class="font-medium">Belajar</span>
                 </a>
-
+                
                 <a href="{{ route('siswa.ujian.daftar') }}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-2xl {{ request()->routeIs('siswa.ujian.*') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50' }}">
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl {{ request()->routeIs('siswa.ujian.daftar') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50' }}">
                     <i class="fas fa-tasks w-5"></i>
                     <span class="font-medium">Ujian</span>
                 </a>
 
+                {{-- Latihan Soal --}}
+                <a href="{{ route('siswa.latihan.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl {{ request()->routeIs('siswa.latihan.*') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50' }}">
+                    <i class="fas fa-dumbbell w-5"></i>
+                    <span class="font-medium">Latihan Soal</span>
+                    <span class="ml-auto px-2 py-0.5 text-xs bg-green-500 text-white rounded-full font-semibold">NEW</span>
+                </a>
+
                 <a href="{{ route('siswa.ai-mentor') }}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-2xl">
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl {{ request()->routeIs('siswa.ai-mentor') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50' }}">
                     <i class="fas fa-robot w-5"></i>
                     <span class="font-medium">AI Mentor</span>
                 </a>
 
                 <a href="{{ route('siswa.badge') }}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-2xl">
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl {{ request()->routeIs('siswa.badge') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50' }}">
                     <i class="fas fa-medal w-5"></i>
                     <span class="font-medium">Badge</span>
                 </a>
 
                 <a href="{{ route('siswa.leaderboard') }}"
-                    class="flex items-center gap-3 px-4 py-3 rounded-2xl">
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl {{ request()->routeIs('siswa.leaderboard') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50' }}">
                     <i class="fas fa-trophy w-5"></i>
                     <span class="font-medium">Leaderboard</span>
                 </a>
@@ -153,7 +161,7 @@
         </nav>
 
 
-        {{-- PROFILE --}}
+        {{-- ================= PROFILE ================= --}}
         <div class="p-4 border-t border-gray-100">
 
             <div class="flex items-center gap-3 p-3 rounded-2xl bg-gray-50">
@@ -182,6 +190,7 @@
     </div>
 </aside>
 
+{{-- Backdrop Overlay untuk Mobile (Alpine.js) --}}
 <div
     x-show="sidebarOpen"
     @click="sidebarOpen = false"

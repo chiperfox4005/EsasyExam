@@ -134,4 +134,4 @@ function handleLogout() {
         document.getElementById('logout-form').submit();
     }
 }
-</script><?php /**PATH E:\laragon\www\EsasyExam\resources\views/components/topbar.blade.php ENDPATH**/ ?>
+</script><?php /**PATH E:\laragon\www\FILE_VSC\EsasyExam\resources\views/components/topbar.blade.php ENDPATH**/ ?>

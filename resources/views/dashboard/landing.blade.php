@@ -4,19 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>EsasyExam - Platform Ujian Online Modern</title>
+    <title>EasyExam - Platform Ujian Online Modern</title>
     
-    <!-- Fonts -->
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/esasyexam-logo.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/logo/esasyexam-logo.png') }}">
+    
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800" rel="stylesheet" />
     
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     
     <style>
@@ -68,22 +67,19 @@
 </head>
 <body class="bg-gray-50" x-data="{ mobileMenu: false, faqOpen: null }">
 
-    <!-- Navbar -->
     <nav class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 gradient-hero rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
+                <div class="flex items-center gap-4">
+                    <img src="{{ asset('images/logo/esasyexam-logo.png') }}" 
+                        alt="EasyExam Logo" 
+                        class="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-lg">
                     <div>
-                        <h1 class="text-xl font-bold text-gray-900">EsasyExam</h1>
-                        <p class="text-xs text-gray-500">Smart Learning Platform</p>
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900">EasyExam</h1>
+                        <p class="text-sm text-gray-500">Smart Learning Platform</p>
                     </div>
                 </div>
                 
-                <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center gap-6">
                     <a href="#fitur" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Fitur</a>
                     <a href="#cara-kerja" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Cara Kerja</a>
@@ -104,14 +100,12 @@
                     @endif
                 </div>
                 
-                <!-- Mobile Menu Button -->
                 <button @click="mobileMenu = !mobileMenu" class="md:hidden p-2 text-gray-600">
                     <i class="fas fa-bars text-2xl"></i>
-                </button>
+                </</button>
             </div>
         </div>
         
-        <!-- Mobile Menu -->
         <div x-show="mobileMenu" class="md:hidden bg-white border-t" x-cloak>
             <div class="px-4 py-3 space-y-3">
                 <a href="#fitur" class="block text-gray-600 hover:text-blue-600 font-medium">Fitur</a>
@@ -132,7 +126,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="gradient-hero relative overflow-hidden">
         <div class="absolute inset-0 opacity-10">
             <div class="absolute top-20 left-10 w-72 h-72 bg-white rounded-full blur-3xl"></div>
@@ -142,6 +135,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div class="text-white animate-fadeIn">
+                    <img src="{{ asset('images/logo/esasyexam-logo.png') }}" 
+                         alt="EasyExam Logo" 
+                         class="w-32 h-32 md:w-40 md:h-40 object-contain mb-6 drop-shadow-2xl">
+                    
                     <div class="inline-block px-4 py-2 bg-white bg-opacity-20 rounded-full text-sm font-semibold mb-6 backdrop-blur-sm">
                         🎓 Platform Ujian Online Terpercaya
                     </div>
@@ -149,7 +146,7 @@
                         Belajar Lebih Mudah & Menyenangkan
                     </h1>
                     <p class="text-lg md:text-xl text-blue-50 mb-8 leading-relaxed">
-                        EsasyExam membantu guru membuat ujian dengan mudah dan siswa belajar dengan lebih interaktif.
+                        EasyExam membantu guru membuat ujian dengan mudah dan siswa belajar dengan lebih interaktif.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4">
                         @auth
@@ -168,7 +165,6 @@
                         </a>
                     </div>
                     
-                    <!-- Stats -->
                     <div class="grid grid-cols-3 gap-6 mt-12 pt-12 border-t border-white border-opacity-20">
                         <div>
                             <p class="text-3xl font-bold">1000+</p>
@@ -192,7 +188,6 @@
                              alt="Students Learning" 
                              class="relative rounded-3xl shadow-2xl w-full object-cover h-96">
                         
-                        <!-- Floating Cards -->
                         <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-xl">
                             <div class="flex items-center gap-3">
                                 <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
@@ -222,16 +217,14 @@
         </div>
     </section>
 
-    <!-- Features Section -->
     <section id="fitur" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Fitur Unggulan Kami</h2>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Fitur Utama Kami</h2>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto">Semua yang Anda butuhkan untuk pembelajaran dan evaluasi yang lebih efektif</p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
                 <div class="gradient-card rounded-3xl p-8 hover-lift border border-blue-100">
                     <div class="w-16 h-16 gradient-hero rounded-2xl flex items-center justify-center text-white text-3xl mb-6 shadow-lg">
                         <i class="fas fa-file-alt"></i>
@@ -240,7 +233,6 @@
                     <p class="text-gray-600 leading-relaxed">Ribuan soal dengan berbagai tipe: pilihan ganda, essay, dengan dukungan gambar dan multimedia.</p>
                 </div>
                 
-                <!-- Feature 2 -->
                 <div class="gradient-card rounded-3xl p-8 hover-lift border border-indigo-100">
                     <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white text-3xl mb-6 shadow-lg">
                         <i class="fas fa-robot"></i>
@@ -249,7 +241,6 @@
                     <p class="text-gray-600 leading-relaxed">Buat soal otomatis dengan AI. Cukup masukkan topik, biarkan AI membuat soal berkualitas.</p>
                 </div>
                 
-                <!-- Feature 3 -->
                 <div class="gradient-card rounded-3xl p-8 hover-lift border border-green-100">
                     <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white text-3xl mb-6 shadow-lg">
                         <i class="fas fa-shield-alt"></i>
@@ -258,7 +249,6 @@
                     <p class="text-gray-600 leading-relaxed">Sistem pengawasan otomatis yang mendeteksi kecurangan saat ujian berlangsung.</p>
                 </div>
                 
-                <!-- Feature 4 -->
                 <div class="gradient-card rounded-3xl p-8 hover-lift border border-purple-100">
                     <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-3xl mb-6 shadow-lg">
                         <i class="fas fa-chart-line"></i>
@@ -267,7 +257,6 @@
                     <p class="text-gray-600 leading-relaxed">Laporan detail performa siswa dengan grafik dan statistik yang mudah dipahami.</p>
                 </div>
                 
-                <!-- Feature 5 -->
                 <div class="gradient-card rounded-3xl p-8 hover-lift border border-orange-100">
                     <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center text-white text-3xl mb-6 shadow-lg">
                         <i class="fas fa-mobile-alt"></i>
@@ -276,7 +265,6 @@
                     <p class="text-gray-600 leading-relaxed">Platform responsive yang bisa diakses dari desktop, tablet, maupun smartphone.</p>
                 </div>
                 
-                <!-- Feature 6 -->
                 <div class="gradient-card rounded-3xl p-8 hover-lift border border-pink-100">
                     <div class="w-16 h-16 bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl flex items-center justify-center text-white text-3xl mb-6 shadow-lg">
                         <i class="fas fa-users"></i>
@@ -288,11 +276,10 @@
         </div>
     </section>
 
-    <!-- How It Works -->
     <section id="cara-kerja" class="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Cara Kerja EsasyExam</h2>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Cara Kerja EasyExam</h2>
                 <p class="text-lg text-gray-600">Mudah dan cepat untuk memulai</p>
             </div>
             
@@ -324,12 +311,11 @@
         </div>
     </section>
 
-    <!-- Testimonials -->
     <section id="testimoni" class="py-20 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Apa Kata Mereka?</h2>
-                <p class="text-lg text-gray-600">Testimoni dari pengguna EsasyExam</p>
+                <p class="text-lg text-gray-600">Testimoni dari pengguna EasyExam</p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -339,7 +325,7 @@
                             <i class="fas fa-star text-yellow-400"></i>
                         @endfor
                     </div>
-                    <p class="text-gray-600 mb-6 leading-relaxed">"EsasyExam sangat membantu saya dalam membuat ujian. Fitur AI generate soal sangat praktis dan menghemat waktu."</p>
+                    <p class="text-gray-600 mb-6 leading-relaxed">"EasyExam sangat membantu saya dalam membuat ujian. Fitur AI generate soal sangat praktis dan menghemat waktu."</p>
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
                             BS
@@ -390,7 +376,6 @@
         </div>
     </section>
 
-    <!-- FAQ Section -->
     <section id="faq" class="py-20 bg-gradient-to-b from-gray-50 to-white">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
@@ -401,10 +386,10 @@
             <div class="space-y-4">
                 @php
                     $faqs = [
-                        ['q' => 'Apa itu EsasyExam?', 'a' => 'EsasyExam adalah platform ujian online yang membantu guru membuat dan mengelola ujian, serta memudahkan siswa dalam mengerjakan ujian secara digital.'],
+                        ['q' => 'Apa itu EasyExam?', 'a' => 'EasyExam adalah platform ujian online yang membantu guru membuat dan mengelola ujian, serta memudahkan siswa dalam mengerjakan ujian secara digital.'],
                         ['q' => 'Bagaimana cara mendaftar?', 'a' => 'Klik tombol "Masuk" di pojok kanan atas, lalu hubungi administrator sekolah untuk mendapatkan akun.'],
-                        ['q' => 'Apakah bisa diakses dari HP?', 'a' => 'Ya, EsasyExam responsive dan bisa diakses dari smartphone, tablet, maupun desktop.'],
-                        ['q' => 'Apakah ada biaya?', 'a' => 'EsasyExam tersedia dalam berbagai paket. Hubungi kami untuk informasi harga dan paket yang tersedia.'],
+                        ['q' => 'Apakah bisa diakses dari HP?', 'a' => 'Ya, EasyExam responsive dan bisa diakses dari smartphone, tablet, maupun desktop.'],
+                        ['q' => 'Apakah ada biaya?', 'a' => 'EasyExam tersedia dalam berbagai paket. Hubungi kami untuk informasi harga dan paket yang tersedia.'],
                         ['q' => 'Bagaimana sistem anti-cheat bekerja?', 'a' => 'Sistem kami mendeteksi perpindahan tab, copy-paste, dan aktivitas mencurigakan lainnya selama ujian berlangsung.']
                     ];
                 @endphp
@@ -425,11 +410,10 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
     <section class="py-20 gradient-hero">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Siap Memulai Pembelajaran Digital?</h2>
-            <p class="text-xl text-blue-100 mb-8">Bergabunglah dengan ribuan guru dan siswa yang sudah menggunakan EsasyExam</p>
+            <p class="text-xl text-blue-100 mb-8">Bergabunglah dengan ribuan guru dan siswa yang sudah menggunakan EasyExam</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 @auth
                     <a href="{{ auth()->user()->role === 'admin' ? '/admin/dashboard' : (auth()->user()->role === 'guru' ? '/guru/dashboard' : '/siswa/dashboard') }}" 
@@ -446,20 +430,21 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <div>
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-10 h-10 gradient-hero rounded-xl flex items-center justify-center text-white font-bold text-xl">
-                            <i class="fas fa-graduation-cap"></i>
-                        </div>
+                    <!-- BAGIAN YANG DIGANTI SESUAI INSTRUKSI -->
+                    <div class="flex items-center gap-4 mb-4">
+                        <img src="{{ asset('images/logo/esasyexam-logo.png') }}" 
+                             alt="EasyExam Logo" 
+                             class="w-16 h-16 object-contain drop-shadow-lg">
                         <div>
-                            <h3 class="text-xl font-bold">EsasyExam</h3>
-                            <p class="text-xs text-gray-400">Smart Learning Platform</p>
+                            <h3 class="text-2xl font-bold">EasyExam</h3>
+                            <p class="text-sm text-gray-400">Smart Learning Platform</p>
                         </div>
                     </div>
+                    <!-- --------------------------------------- -->
                     <p class="text-gray-400 text-sm leading-relaxed">Platform ujian online modern untuk pembelajaran yang lebih efektif dan menyenangkan.</p>
                 </div>
                 
@@ -484,7 +469,7 @@
                 <div>
                     <h4 class="font-bold text-lg mb-4">Hubungi Kami</h4>
                     <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><i class="fas fa-envelope mr-2"></i> info@esasyexam.com</li>
+                        <li><i class="fas fa-envelope mr-2"></i> info@easyexam.com</li>
                         <li><i class="fas fa-phone mr-2"></i> 021-12345678</li>
                         <li class="flex gap-3 mt-4">
                             <a href="#" class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"><i class="fab fa-facebook-f"></i></a>
@@ -496,7 +481,7 @@
             </div>
             
             <div class="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-                <p>&copy; {{ date('Y') }} EsasyExam. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} EasyExam. All rights reserved.</p>
             </div>
         </div>
     </footer>

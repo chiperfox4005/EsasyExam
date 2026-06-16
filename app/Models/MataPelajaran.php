@@ -35,4 +35,10 @@ class MataPelajaran extends Model
     public function ujian() {
         return $this->hasMany(Ujian::class, 'mapel_id');
     }
+
+    // ✅ RELASI BARU: Hubungan One-to-Many ke Paket Latihan
+    public function paketLatihan()
+    {
+        return $this->hasMany(PaketLatihan::class, 'mapel_id');
+    }
 }

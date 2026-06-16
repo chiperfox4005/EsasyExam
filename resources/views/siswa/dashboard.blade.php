@@ -5,7 +5,6 @@
 @section('content')
 <div class="max-w-7xl mx-auto space-y-6 animate-fadeIn" x-data="dashboardApp()">
     
-    <!-- Welcome Banner dengan Real-time Clock -->
     <div class="relative overflow-hidden rounded-3xl shadow-xl">
         <div class="absolute inset-0 bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-600"></div>
         <div class="absolute inset-0 opacity-20">
@@ -29,7 +28,6 @@
                     </div>
                 </div>
                 
-                <!-- Real-time Clock -->
                 <div class="bg-white bg-opacity-20 backdrop-blur-sm rounded-2xl px-6 py-4 border-2 border-white border-opacity-30">
                     <div class="text-center">
                         <p class="text-4xl font-bold font-mono" x-text="currentTime"></p>
@@ -38,7 +36,6 @@
                 </div>
             </div>
             
-            <!-- Motivational Message -->
             <div class="mt-6 p-4 bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl border-2 border-white border-opacity-20">
                 <p class="text-lg" x-text="motivationalMessage"></p>
             </div>
@@ -54,9 +51,19 @@
         </div>
     </div>
 
-    <!-- Stats Cards -->
+    <div class="bg-white rounded-2xl p-4 shadow-lg border-2 border-gray-100">
+        <div class="relative">
+            <input type="text" 
+                   id="dashboardSearch"
+                   placeholder="Cari fitur, menu, mata pelajaran, atau ujian..." 
+                   class="w-full px-5 py-3 pl-12 bg-gray-50 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-gray-700 font-medium placeholder-gray-400">
+            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg"></i>
+        </div>
+        
+        <div id="searchResults" class="mt-3 space-y-2 hidden"></div>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Ujian Aktif -->
         <div class="group bg-white rounded-3xl p-5 shadow-lg border-2 border-gray-100 hover:border-blue-300 hover:shadow-xl transition-all">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
@@ -68,7 +75,6 @@
             <p class="text-sm text-gray-600 font-medium mt-1">Ujian Tersedia</p>
         </div>
 
-        <!-- Ujian Dikerjakan -->
         <div class="group bg-white rounded-3xl p-5 shadow-lg border-2 border-gray-100 hover:border-green-300 hover:shadow-xl transition-all">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
@@ -80,7 +86,6 @@
             <p class="text-sm text-gray-600 font-medium mt-1">Ujian Selesai</p>
         </div>
 
-        <!-- Rata-rata Nilai -->
         <div class="group bg-white rounded-3xl p-5 shadow-lg border-2 border-gray-100 hover:border-yellow-300 hover:shadow-xl transition-all">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
@@ -88,11 +93,10 @@
                 </div>
                 <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">Nilai</span>
             </div>
-            <p class="text-3xl font-bold text-gray-900">{{ number_format($rataRataNilai, 1) }}</p>
+            <p class="text-3xl font-bold text-gray-900">{{ number_format($rataRataNilai ?? 0, 1) }}</p>
             <p class="text-sm text-gray-600 font-medium mt-1">Rata-rata Nilai</p>
         </div>
 
-        <!-- Progress -->
         <div class="group bg-white rounded-3xl p-5 shadow-lg border-2 border-gray-100 hover:border-purple-300 hover:shadow-xl transition-all">
             <div class="flex items-center justify-between mb-3">
                 <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
@@ -110,10 +114,8 @@
         </div>
     </div>
 
-    <!-- Main Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Ujian Aktif (2/3 width) -->
         <div class="lg:col-span-2 bg-white rounded-3xl p-6 shadow-lg border-2 border-gray-100">
             <div class="flex items-center justify-between mb-5">
                 <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -126,9 +128,9 @@
             </div>
             
             @if($ujianAktif->count() > 0)
-                <div class="space-y-3">
+                <div class="space-y-3" id="dashboardActiveExamsList">
                     @foreach($ujianAktif as $ujian)
-                        <div class="group border-2 border-gray-200 rounded-2xl p-4 hover:border-blue-400 hover:shadow-lg transition-all bg-gradient-to-r from-white to-blue-50">
+                        <div class="exam-card group border-2 border-gray-200 rounded-2xl p-4 hover:border-blue-400 hover:shadow-lg transition-all bg-gradient-to-r from-white to-blue-50" data-title="{{ strtolower($ujian->judul) }}" data-mapel="{{ strtolower($ujian->mapel->nama ?? '') }}">
                             <div class="flex items-start justify-between gap-4">
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-center gap-2 mb-2 flex-wrap">
@@ -140,7 +142,7 @@
                                             {{ $ujian->mapel->nama ?? '-' }}
                                         </span>
                                     </div>
-                                    <h4 class="font-bold text-gray-900 text-base mb-2 group-hover:text-blue-600 transition-colors">{{ $ujian->judul }}</h4>
+                                    <h4 class="font-bold text-gray-900 text-base mb-2 group-hover:text-blue-600 transition-colors search-target-title">{{ $ujian->judul }}</h4>
                                     <div class="flex items-center gap-4 text-xs text-gray-600 flex-wrap">
                                         <span class="flex items-center gap-1">
                                             <i class="fas fa-list-ol text-purple-500"></i>
@@ -176,10 +178,8 @@
             @endif
         </div>
 
-        <!-- Sidebar (1/3 width) -->
         <div class="space-y-6">
             
-            <!-- Chart Nilai per Mapel -->
             <div class="bg-white rounded-3xl p-6 shadow-lg border-2 border-gray-100">
                 <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <i class="fas fa-chart-pie text-purple-500"></i>
@@ -198,7 +198,6 @@
                 @endif
             </div>
 
-            <!-- Riwayat Terbaru -->
             <div class="bg-white rounded-3xl p-6 shadow-lg border-2 border-gray-100">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -213,23 +212,43 @@
                 @if($riwayatUjian->count() > 0)
                     <div class="space-y-3">
                         @foreach($riwayatUjian->take(3) as $riwayat)
-                            <a href="{{ route('siswa.ujian.hasil', $riwayat->ujian_id) }}" 
-                               class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
-                                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 {{ $riwayat->nilai >= 75 ? 'bg-green-100' : 'bg-red-100' }}">
-                                    <i class="fas {{ $riwayat->nilai >= 75 ? 'fa-check text-green-600' : 'fa-times text-red-600' }}"></i>
+                            @if($riwayat->submitted_at)
+                                <a href="{{ route('siswa.ujian.hasil', $riwayat->id) }}" 
+                                   class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors group">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 {{ ($riwayat->nilai ?? 0) >= 75 ? 'bg-green-100' : 'bg-red-100' }}">
+                                        <i class="fas {{ ($riwayat->nilai ?? 0) >= 75 ? 'fa-check text-green-600' : 'fa-times text-red-600' }}"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-gray-900 text-sm truncate group-hover:text-blue-600 transition-colors">
+                                            {{ $riwayat->ujian->judul ?? 'Ujian' }}
+                                        </p>
+                                        <p class="text-xs text-gray-500">
+                                            {{ $riwayat->ujian->mapel->nama ?? '-' }} • {{ $riwayat->submitted_at->diffForHumans() }}
+                                        </p>
+                                    </div>
+                                    <span class="font-bold text-sm {{ ($riwayat->nilai ?? 0) >= 75 ? 'text-green-600' : 'text-red-600' }}">
+                                        {{ number_format($riwayat->nilai ?? 0, 0) }}
+                                    </span>
+                                </a>
+                            @else
+                                <div class="flex items-center gap-3 p-3 rounded-xl bg-yellow-50 border border-yellow-200">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-yellow-100">
+                                        <i class="fas fa-spinner fa-spin text-yellow-600"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-gray-900 text-sm truncate">
+                                            {{ $riwayat->ujian->judul ?? 'Ujian' }}
+                                        </p>
+                                        <p class="text-xs text-yellow-700">
+                                            <i class="fas fa-clock mr-1"></i> Sedang dikerjakan
+                                        </p>
+                                    </div>
+                                    <a href="{{ route('siswa.ujian.kerjakan', $riwayat->id) }}" 
+                                       class="px-3 py-1.5 bg-yellow-500 text-white rounded-lg text-xs font-bold hover:bg-yellow-600">
+                                        Lanjutkan
+                                    </a>
                                 </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-semibold text-gray-900 text-sm truncate group-hover:text-blue-600 transition-colors">
-                                        {{ $riwayat->ujian->judul ?? 'Ujian' }}
-                                    </p>
-                                    <p class="text-xs text-gray-500">
-                                        {{ $riwayat->ujian->mapel->nama ?? '-' }} • {{ $riwayat->submitted_at->diffForHumans() }}
-                                    </p>
-                                </div>
-                                <span class="font-bold text-sm {{ $riwayat->nilai >= 75 ? 'text-green-600' : 'text-red-600' }}">
-                                    {{ number_format($riwayat->nilai, 0) }}
-                                </span>
-                            </a>
+                            @endif
                         @endforeach
                     </div>
                 @else
@@ -239,7 +258,6 @@
                 @endif
             </div>
 
-            <!-- Quick Tips -->
             <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-3xl p-6 border-2 border-yellow-200">
                 <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
                     <i class="fas fa-lightbulb text-yellow-500"></i>
@@ -269,10 +287,12 @@
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // --- ALPINE.JS APP INITIALIZER ---
     function dashboardApp() {
         return {
             currentTime: '',
@@ -317,7 +337,60 @@
         };
     }
     
+    // --- VANILLA JS DOM CONTROLLER ---
     document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        const searchInput = document.getElementById('dashboardSearch');
+        const searchResults = document.getElementById('searchResults');
+        
+        const menuItems = [
+            { name: 'Dashboard', url: '{{ route("siswa.dashboard") }}', icon: 'home' },
+            { name: 'Belajar', url: '{{ route("siswa.belajar") }}', icon: 'book-reader' },
+            { name: 'Ujian', url: '{{ route("siswa.ujian.daftar") }}', icon: 'tasks' },
+            { name: 'AI Mentor', url: '{{ route("siswa.ai-mentor") }}', icon: 'robot' },
+            { name: 'Badge', url: '{{ route("siswa.badge") }}', icon: 'medal' },
+            { name: 'Leaderboard', url: '{{ route("siswa.leaderboard") }}', icon: 'trophy' },
+            { name: 'Riwayat', url: '{{ route("siswa.riwayat") }}', icon: 'history' },
+        ];
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value.toLowerCase().trim();
+                
+                if (query.length === 0) {
+                    searchResults.classList.add('hidden');
+                    // Tampilkan kembali semua card ujian aktif jika pencarian kosong
+                    document.querySelectorAll('.exam-card').forEach(el => el.classList.remove('hidden'));
+                    return;
+                }
+                
+                const results = menuItems.filter(item => 
+                    item.name.toLowerCase().includes(query)
+                );
+                
+                if (results.length > 0) {
+                    searchResults.innerHTML = results.map(item => `
+                        <a href="${item.url}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+                            <i class="fas fa-${item.icon} text-blue-600"></i>
+                            <span class="font-medium text-gray-700">${item.name}</span>
+                        </a>
+                    `).join('');
+                    searchResults.classList.remove('hidden');
+                } else {
+                    searchResults.innerHTML = '<p class="text-gray-500 text-sm p-3">Tidak ditemukan</p>';
+                    searchResults.classList.remove('hidden');
+                }
+            });
+
+            // Opsional: Sembunyikan dropdown hasil jika klik di luar search bar
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.classList.add('hidden');
+                }
+            });
+        }
+        
+        // Chart JS Logic
         const ctx = document.getElementById('nilaiChart');
         if (ctx) {
             const labels = @json($mapelLabels);
@@ -359,4 +432,3 @@
     });
 </script>
 @endpush
-@endsection

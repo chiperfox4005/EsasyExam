@@ -17,9 +17,6 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Alpine.js CDN (WAJIB!) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
-    
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
@@ -188,4 +185,4 @@
         });
     </script>
 </body>
-</html><?php /**PATH E:\laragon\www\EsasyExam\resources\views/layouts/app.blade.php ENDPATH**/ ?>
+</html><?php /**PATH E:\laragon\www\FILE_VSC\EsasyExam\resources\views/layouts/app.blade.php ENDPATH**/ ?>

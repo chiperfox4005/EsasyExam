@@ -102,6 +102,14 @@
                     <span class="ml-auto px-2 py-0.5 text-xs bg-purple-500 text-white rounded-full font-semibold">NEW</span>
                 </a>
 
+                
+                <a href="<?php echo e(route('guru.paket-latihan.index')); ?>"
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl <?php echo e(request()->routeIs('guru.paket-latihan.*') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50'); ?> transition-all duration-200">
+                    <i class="fas fa-box-open w-5"></i>
+                    <span class="font-medium">Paket Latihan</span>
+                    <span class="ml-auto px-2 py-0.5 text-xs bg-emerald-500 text-white rounded-full font-semibold">NEW</span>
+                </a>
+
                 <a href="<?php echo e(route('ujian.index')); ?>"
                     class="flex items-center gap-3 px-4 py-3 rounded-2xl <?php echo e(request()->routeIs('ujian.*') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50'); ?>">
                     <i class="fas fa-clipboard-list w-5"></i>
@@ -123,27 +131,36 @@
                     <i class="fas fa-book-reader w-5"></i>
                     <span class="font-medium">Belajar</span>
                 </a>
-
+                
+                
                 <a href="<?php echo e(route('siswa.ujian.daftar')); ?>"
-                    class="flex items-center gap-3 px-4 py-3 rounded-2xl <?php echo e(request()->routeIs('siswa.ujian.*') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50'); ?>">
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl <?php echo e(request()->routeIs('siswa.ujian.daftar') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50'); ?>">
                     <i class="fas fa-tasks w-5"></i>
                     <span class="font-medium">Ujian</span>
                 </a>
 
+                
+                <a href="<?php echo e(route('siswa.latihan.index')); ?>"
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl <?php echo e(request()->routeIs('siswa.latihan.*') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50'); ?>">
+                    <i class="fas fa-dumbbell w-5"></i>
+                    <span class="font-medium">Latihan Soal</span>
+                    <span class="ml-auto px-2 py-0.5 text-xs bg-green-500 text-white rounded-full font-semibold">NEW</span>
+                </a>
+
                 <a href="<?php echo e(route('siswa.ai-mentor')); ?>"
-                    class="flex items-center gap-3 px-4 py-3 rounded-2xl">
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl <?php echo e(request()->routeIs('siswa.ai-mentor') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50'); ?>">
                     <i class="fas fa-robot w-5"></i>
                     <span class="font-medium">AI Mentor</span>
                 </a>
 
                 <a href="<?php echo e(route('siswa.badge')); ?>"
-                    class="flex items-center gap-3 px-4 py-3 rounded-2xl">
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl <?php echo e(request()->routeIs('siswa.badge') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50'); ?>">
                     <i class="fas fa-medal w-5"></i>
                     <span class="font-medium">Badge</span>
                 </a>
 
                 <a href="<?php echo e(route('siswa.leaderboard')); ?>"
-                    class="flex items-center gap-3 px-4 py-3 rounded-2xl">
+                    class="flex items-center gap-3 px-4 py-3 rounded-2xl <?php echo e(request()->routeIs('siswa.leaderboard') ? 'gradient-primary text-white shadow-lg shadow-blue-500/30' : 'text-gray-600 hover:bg-gray-50'); ?>">
                     <i class="fas fa-trophy w-5"></i>
                     <span class="font-medium">Leaderboard</span>
                 </a>
@@ -188,4 +205,4 @@
     x-show="sidebarOpen"
     @click="sidebarOpen = false"
     class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-></div><?php /**PATH E:\laragon\www\EsasyExam\resources\views/components/sidebar.blade.php ENDPATH**/ ?>
+></div><?php /**PATH E:\laragon\www\FILE_VSC\EsasyExam\resources\views/components/sidebar.blade.php ENDPATH**/ ?>

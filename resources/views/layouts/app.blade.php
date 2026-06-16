@@ -7,20 +7,17 @@
     
     <title>{{ config('app.name', 'EsasyExam') }} - @yield('title', 'Dashboard')</title>
     
-    <!-- Fonts -->
+    <link rel="icon" type="image/png" href="{{ asset('images/logo/esasyexam-logo.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('images/logo/esasyexam-logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo/esasyexam-logo.png') }}">
+    
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800" rel="stylesheet" />
     
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Alpine.js CDN (WAJIB!) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
-    
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
     @livewireStyles
@@ -98,15 +95,27 @@
 </head>
 <body class="font-sans antialiased" x-data="{ sidebarOpen: false }">
     <div class="min-h-screen flex">
-        <!-- Sidebar -->
-        @include('components.sidebar')
         
-        <!-- Main Content -->
+        <div class="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
+            <div class="flex items-center gap-3 px-6 py-4">
+                <img src="{{ asset('images/logo/esasyexam-logo.png') }}" 
+                     alt="EsasyExam Logo" 
+                     class="w-12 h-12 object-contain">
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">EsasyExam</h1>
+                    <p class="text-xs text-gray-500">Smart Learning</p>
+                </div>
+            </div>
+
+            <div class="flex-1">
+                @if(Request::is('admin*'))
+                @endif
+            </div>
+        </div>
+        
         <div class="flex-1 flex flex-col min-w-0">
-            <!-- Topbar -->
             @include('components.topbar')
             
-            <!-- Page Content -->
             <main class="flex-1 p-6 lg:p-8">
                 @yield('content')
             </main>
@@ -117,7 +126,6 @@
     
     @stack('scripts')
     
-    <!-- Chart.js Initialization Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const chartCanvas = document.getElementById('userChart');

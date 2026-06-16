@@ -6,98 +6,61 @@ use App\Models\BankSoal;
 use App\Models\MataPelajaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-
-use App\Imports\SoalImport;
-use Maatwebsite\Excel\Facades\Excel;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class BankSoalController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = BankSoal::where('guru_id', Auth::id())
-            ->with('mapel');
-
-        if ($request->filled('mapel_id')) {
-            $query->where('mapel_id', $request->mapel_id);
-        }
-
-        if ($request->filled('tipe')) {
-            $query->where('tipe', $request->tipe);
-        }
-
-        if ($request->filled('level')) {
-            $query->where('level', $request->level);
-        }
-
-        if ($request->filled('search')) {
-            $query->where(
-                'pertanyaan',
-                'like',
-                '%' . $request->search . '%'
-            );
-        }
-
-        $soal = $query->latest()->paginate(12);
-
-        $mapelList = MataPelajaran::where(
-            'guru_id',
-            Auth::id()
-        )->get();
-
-        $totalSoal = BankSoal::where(
-            'guru_id',
-            Auth::id()
-        )->count();
-
-        $soalPublished = BankSoal::where(
-            'guru_id',
-            Auth::id()
-        )->where(
-            'status',
-            'published'
-        )->count();
-
-        $soalDraft = BankSoal::where(
-            'guru_id',
-            Auth::id()
-        )->where(
-            'status',
-            'draft'
-        )->count();
-
-        return view(
-            'bank-soal.index',
-            compact(
-                'soal',
-                'mapelList',
-                'totalSoal',
-                'soalPublished',
-                'soalDraft'
-            )
-        );
+{
+    $query = BankSoal::where('guru_id', Auth::id())->with('mapel');
+    
+    // Filter berdasarkan mapel
+    if ($request->filled('mapel_id')) {
+        $query->where('mapel_id', $request->mapel_id);
     }
+    
+    // Filter berdasarkan tipe
+    if ($request->filled('tipe')) {
+        $query->where('tipe', $request->tipe);
+    }
+    
+    // Filter berdasarkan level
+    if ($request->filled('level')) {
+        $query->where('level', $request->level);
+    }
+    
+    // Search berdasarkan pertanyaan
+    if ($request->filled('search')) {
+        $query->where('pertanyaan', 'like', '%' . $request->search . '%');
+    }
+    
+    $soalList = $query->orderBy('created_at', 'desc')->paginate(12);
+    
+    // ✅ TAMBAHKAN VARIABLE INI
+    $totalSoal = BankSoal::where('guru_id', Auth::id())->count();
+    $totalPG = BankSoal::where('guru_id', Auth::id())->where('tipe', 'pg')->count();
+    $totalEssay = BankSoal::where('guru_id', Auth::id())->where('tipe', 'essay')->count();
+    
+    // ✅ PENTING: Tambahkan $mapelList untuk filter dropdown
+    $mapelList = \App\Models\MataPelajaran::orderBy('nama')->get();
+    
+    return view('bank-soal.index', compact(
+        'soalList', 
+        'totalSoal', 
+        'totalPG', 
+        'totalEssay',
+        'mapelList'  // ✅ TAMBAHKAN INI
+    ));
+}
 
     public function create()
-    {
-        $mapelList = MataPelajaran::where(
-            'guru_id',
-            Auth::id()
-        )->get();
+{
+    // ✅ AMBIL SEMUA MAPEL (TANPA FILTER)
+    $mapelList = \App\Models\MataPelajaran::orderBy('nama')->get();
+    
+    return view('bank-soal.create', compact('mapelList'));
+}
 
-        if ($mapelList->isEmpty()) {
-            $mapelList = MataPelajaran::all();
-        }
-
-        return view(
-            'bank-soal.create',
-            compact('mapelList')
-        );
-    }
-
-  public function store(Request $request)
+    public function store(Request $request)
 {
     $request->validate([
         'mapel_id' => 'required|exists:mata_pelajarans,id',
@@ -105,14 +68,37 @@ class BankSoalController extends Controller
     ]);
 
     $created = 0;
+    $updated = 0;
     
+    $isEditMode = $request->has('edit_mode');
+    $mapelIdEdit = $request->mapel_id_edit;
+    
+    // Jika edit mode, hapus soal yang tidak ada di list
+    if ($isEditMode && $mapelIdEdit) {
+        $updatedIds = [];
+        if ($request->has('soal_list')) {
+            foreach ($request->soal_list as $soalData) {
+                if (!empty($soalData['id'])) {
+                    $updatedIds[] = $soalData['id'];
+                }
+            }
+        }
+        
+        BankSoal::where('guru_id', Auth::id())
+            ->where('mapel_id', $mapelIdEdit)
+            ->whereNotIn('id', $updatedIds)
+            ->delete();
+    }
+    
+    // Process soal list
     if ($request->has('soal_list') && is_array($request->soal_list)) {
         foreach ($request->soal_list as $soalData) {
-            BankSoal::create([
+            // ✅ FORMAT BENAR: opsi[A], opsi[B], opsi[C], opsi[D]
+            $data = [
                 'guru_id' => Auth::id(),
                 'mapel_id' => $request->mapel_id,
-                'tipe' => $soalData['tipe'],
-                'pertanyaan' => $soalData['pertanyaan'],
+                'tipe' => $soalData['tipe'] ?? 'pg',
+                'pertanyaan' => $soalData['pertanyaan'] ?? '',
                 'level' => $request->level,
                 'status' => 'published',
                 'opsi_a' => $soalData['opsi']['A'] ?? null,
@@ -125,237 +111,75 @@ class BankSoalController extends Controller
                 'opsi_b_tipe' => 'text',
                 'opsi_c_tipe' => 'text',
                 'opsi_d_tipe' => 'text',
-            ]);
-            $created++;
+            ];
+            
+            // Update jika ada ID, create jika tidak
+            if (!empty($soalData['id'])) {
+                BankSoal::where('id', $soalData['id'])
+                    ->where('guru_id', Auth::id())
+                    ->update($data);
+                $updated++;
+            } else {
+                BankSoal::create($data);
+                $created++;
+            }
         }
+    }
+
+    if ($isEditMode) {
+        $message = "✅ Berhasil update {$updated} soal!";
+    } else {
+        $message = "✅ Berhasil menyimpan {$created} soal ke Bank Soal!";
     }
 
     return redirect()->route('bank-soal.index')
-        ->with('success', "Berhasil menyimpan {$created} soal ke Bank Soal! 🎉");
+        ->with('success', $message);
 }
     public function edit($id)
+{
+    // Ambil soal yang diklik untuk tahu mapel-nya
+    $soal = BankSoal::where('guru_id', Auth::id())->findOrFail($id);
+    
+    // ✅ AMBIL SEMUA SOAL DARI MAPEL YANG SAMA
+    $soalListExisting = BankSoal::where('guru_id', Auth::id())
+        ->where('mapel_id', $soal->mapel_id)
+        ->orderBy('created_at', 'asc')
+        ->get();
+    
+    // Ambil semua mapel untuk dropdown
+    $mapelList = \App\Models\MataPelajaran::orderBy('nama')->get();
+    
+    // ✅ REDIRECT KE CREATE DENGAN DATA SOAL
+    return view('bank-soal.create', compact('mapelList', 'soalListExisting', 'soal'));
+}
+
+    public function update(Request $request, $id)
     {
-        $soal = BankSoal::where(
-            'guru_id',
-            Auth::id()
-        )->findOrFail($id);
+        $soal = BankSoal::where('guru_id', Auth::id())->findOrFail($id);
+        
+        $request->validate([
+            'mapel_id' => 'required|exists:mata_pelajarans,id',
+            'level' => 'required|in:mudah,sedang,sulit',
+        ]);
 
-        $mapelList = MataPelajaran::all();
+        $soal->update([
+            'mapel_id' => $request->mapel_id,
+            'level' => $request->level,
+            'pertanyaan' => $request->pertanyaan,
+            'jawaban' => $request->jawaban,
+            'penjelasan' => $request->penjelasan,
+        ]);
 
-        return view(
-            'bank-soal.edit',
-            compact(
-                'soal',
-                'mapelList'
-            )
-        );
-    }
-
-    public function update(
-        Request $request,
-        $id
-    ) {
-        $soal = BankSoal::where(
-            'guru_id',
-            Auth::id()
-        )->findOrFail($id);
-
-        $data = $request->except(
-            'gambar_soal'
-        );
-
-        if ($request->hasFile('gambar_soal')) {
-
-            if ($soal->gambar_soal) {
-                Storage::disk('public')
-                    ->delete(
-                        $soal->gambar_soal
-                    );
-            }
-
-            $data['gambar_soal'] =
-                $request
-                    ->file('gambar_soal')
-                    ->store(
-                        'soal-images',
-                        'public'
-                    );
-        }
-
-        $soal->update($data);
-
-        return redirect()
-            ->route('bank-soal.index')
-            ->with(
-                'success',
-                'Soal berhasil diperbarui!'
-            );
+        return redirect()->route('bank-soal.index')
+            ->with('success', 'Soal berhasil diperbarui!');
     }
 
     public function destroy($id)
     {
-        $soal = BankSoal::where(
-            'guru_id',
-            Auth::id()
-        )->findOrFail($id);
-
-        if ($soal->gambar_soal) {
-            Storage::disk('public')
-                ->delete(
-                    $soal->gambar_soal
-                );
-        }
-
+        $soal = BankSoal::where('guru_id', Auth::id())->findOrFail($id);
         $soal->delete();
 
-        return redirect()
-            ->route('bank-soal.index')
-            ->with(
-                'success',
-                'Soal berhasil dihapus!'
-            );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | IMPORT EXCEL
-    |--------------------------------------------------------------------------
-    */
-
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' =>
-                'required|mimes:xlsx,xls,csv|max:5120',
-        ]);
-
-        try {
-
-            Excel::import(
-                new SoalImport,
-                $request->file('file')
-            );
-
-            $message =
-                'Soal berhasil diimport!';
-
-            return redirect()
-                ->route('bank-soal.index')
-                ->with(
-                    'success',
-                    $message
-                );
-
-        } catch (
-            \Maatwebsite\Excel\Validators\ValidationException $e
-        ) {
-
-            $errors = [];
-
-            foreach (
-                $e->failures()
-                as $failure
-            ) {
-                $errors[] =
-                    "Baris {$failure->row()}: "
-                    .
-                    implode(
-                        ', ',
-                        $failure->errors()
-                    );
-            }
-
-            return back()->with(
-                'error',
-                implode(
-                    ' | ',
-                    $errors
-                )
-            );
-        }
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | DOWNLOAD TEMPLATE
-    |--------------------------------------------------------------------------
-    */
-
-    public function downloadTemplate()
-    {
-        $spreadsheet =
-            new Spreadsheet();
-
-        $sheet =
-            $spreadsheet
-            ->getActiveSheet();
-
-        $header = [
-            'Mapel',
-            'Tipe',
-            'Pertanyaan',
-            'Opsi A',
-            'Opsi B',
-            'Opsi C',
-            'Opsi D',
-            'Opsi E',
-            'Jawaban',
-            'Level'
-        ];
-
-        foreach (
-            $header
-            as $i => $value
-        ) {
-            $sheet->setCellValue(
-                chr(65 + $i) . '1',
-                $value
-            );
-        }
-
-        $sample = [
-            'Matematika',
-            'pg',
-            'Berapa hasil dari 5 + 5?',
-            '8',
-            '9',
-            '10',
-            '11',
-            '12',
-            'C',
-            'mudah'
-        ];
-
-        foreach (
-            $sample
-            as $i => $value
-        ) {
-            $sheet->setCellValue(
-                chr(65 + $i) . '2',
-                $value
-            );
-        }
-
-        $writer =
-            new Xlsx(
-                $spreadsheet
-            );
-
-        return response()->stream(
-            function () use ($writer) {
-                $writer->save(
-                    'php://output'
-                );
-            },
-            200,
-            [
-                'Content-Type' =>
-                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-
-                'Content-Disposition' =>
-                    'attachment; filename="Template_Import_Soal.xlsx"',
-            ]
-        );
+        return redirect()->route('bank-soal.index')
+            ->with('success', 'Soal berhasil dihapus!');
     }
 }
-

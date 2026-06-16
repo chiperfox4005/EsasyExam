@@ -407,10 +407,13 @@
 
             <!-- Welcome Text -->
             <div class="text-center mb-8">
-                <div class="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-xl bounce-soft"
-                     :class="role === 'siswa' ? 'bg-gradient-to-br from-yellow-400 to-yellow-500' : (role === 'guru' ? 'bg-gradient-to-br from-blue-500 to-blue-600' : 'bg-gradient-to-br from-red-500 to-red-600')">
-                    <i class="fas" 
-                       :class="role === 'siswa' ? 'fa-user-graduate text-4xl text-white' : (role === 'guru' ? 'fa-chalkboard-teacher text-4xl text-white' : 'fa-shield-alt text-4xl text-white')"></i>
+                <!-- SESUDAH -->
+                <div class="text-center mb-8">
+                    <img src="{{ asset('images/logo/esasyexam-logo.png') }}" 
+                        alt="EsasyExam Logo" 
+                        class="w-32 h-32 md:w-40 md:h-40 mx-auto mb-4 drop-shadow-xl">
+                    <h1 class="text-4xl font-bold text-gray-900">EsasyExam</h1>
+                    <p class="text-gray-600 mt-2">Smart Learning Platform</p>
                 </div>
                 <h2 class="text-3xl font-bold text-gray-900 mb-2">
                     <template x-if="role === 'siswa'">Halo, Sobat Belajar! 👋</template>

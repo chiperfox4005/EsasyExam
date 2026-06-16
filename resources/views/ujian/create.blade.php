@@ -174,7 +174,7 @@
             </template>
         </div>
 
-        <!-- STEP 2: Buat Soal -->
+        <!-- STEP 2: Buat Soal - FORM DI ATAS, LIST SOAL DI BAWAH -->
         <div class="bg-white rounded-3xl p-6 shadow-xl border-2 border-gray-200">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -187,68 +187,8 @@
                 </div>
             </div>
 
-            <!-- LIST SOAL -->
-            <div class="space-y-4 mb-6">
-                <template x-for="(soal, index) in soalList" :key="'soal-' + index">
-                    <div class="border-2 border-gray-200 rounded-2xl p-5 hover:shadow-lg transition-all bg-gradient-to-r from-gray-50 to-white">
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="flex items-center gap-3">
-                                <span class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg" x-text="index + 1"></span>
-                                <span class="px-3 py-1 text-xs font-bold rounded-full" 
-                                      :class="soal.tipe === 'pg' ? 'bg-blue-100 text-blue-700 border-2 border-blue-300' : 'bg-purple-100 text-purple-700 border-2 border-purple-300'" 
-                                      x-text="soal.tipe === 'pg' ? 'PILIHAN GANDA' : 'ESSAY'"></span>
-                            </div>
-                            <button type="button" @click="hapusSoal(index)" class="text-red-600 hover:text-red-700 text-sm font-bold flex items-center gap-1 px-3 py-1 rounded-lg hover:bg-red-50">
-                                <i class="fas fa-trash"></i> Hapus
-                            </button>
-                        </div>
-                        
-                        <p class="text-gray-900 font-bold text-base mb-3" x-text="soal.pertanyaan"></p>
-                        
-                        <template x-if="soal.gambarSoal">
-                            <img :src="soal.gambarSoal" class="max-h-64 rounded-xl border-2 border-gray-200 shadow-md mb-3">
-                        </template>
-                        
-                        <template x-if="soal.tipe === 'pg'">
-                            <div class="space-y-2">
-                                <template x-for="(opsi, idx) in soal.opsi" :key="'opsi-' + idx">
-                                    <div>
-                                        <div class="flex items-center gap-3 p-2 rounded-lg" 
-                                             :class="String.fromCharCode(65 + idx) === soal.jawaban ? 'bg-green-50 border-2 border-green-300' : 'bg-white border-2 border-gray-200'">
-                                            <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" 
-                                                  :class="String.fromCharCode(65 + idx) === soal.jawaban ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'" 
-                                                  x-text="String.fromCharCode(65 + idx)"></span>
-                                            <span class="flex-1 text-sm text-gray-700" x-text="opsi.teks"></span>
-                                            <span x-show="String.fromCharCode(65 + idx) === soal.jawaban" class="text-green-600 font-bold text-xs">✓ Benar</span>
-                                        </div>
-                                        <template x-if="opsi.gambar">
-                                            <img :src="opsi.gambar" class="max-h-32 rounded-lg border-2 border-gray-200 shadow-sm ml-10 mt-1 mb-2">
-                                        </template>
-                                    </div>
-                                </template>
-                            </div>
-                        </template>
-                        
-                        <template x-if="soal.tipe === 'essay'">
-                            <div class="mt-3 p-3 bg-purple-50 border-2 border-purple-200 rounded-xl">
-                                <p class="text-xs font-bold text-purple-700 mb-1">💡 Kunci Jawaban:</p>
-                                <p class="text-sm text-gray-800" x-text="soal.jawaban"></p>
-                            </div>
-                        </template>
-                    </div>
-                </template>
-                
-                <div x-show="soalList.length === 0" class="p-8 bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-dashed border-gray-300 rounded-2xl text-center">
-                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-clipboard-list text-3xl text-gray-400"></i>
-                    </div>
-                    <p class="text-gray-600 font-semibold">Belum ada soal</p>
-                    <p class="text-sm text-gray-500 mt-1">Silakan buat soal pertama Anda di bawah ini</p>
-                </div>
-            </div>
-
-            <!-- FORM TAMBAH SOAL -->
-            <div class="border-2 border-blue-200 rounded-2xl p-6 bg-gradient-to-br from-blue-50 to-indigo-50">
+            <!-- ✅ FORM TAMBAH SOAL - SELALU DI ATAS (ID untuk scroll target) -->
+            <div id="formTambahSoal" class="border-2 border-blue-200 rounded-2xl p-6 bg-gradient-to-br from-blue-50 to-indigo-50 mb-6">
                 <h4 class="font-bold text-blue-900 mb-4 flex items-center gap-2">
                     <i class="fas fa-plus-circle text-blue-600"></i>
                     <span>Tambah Soal #<span x-text="soalList.length + 1"></span></span>
@@ -382,6 +322,71 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ✅ LIST SOAL - DI BAWAH FORM -->
+            <div class="space-y-4 mb-6">
+                <h4 class="font-bold text-gray-900 flex items-center gap-2 mb-3" x-show="soalList.length > 0">
+                    <i class="fas fa-list-ol text-green-600"></i>
+                    <span>Daftar Soal yang Sudah Dibuat</span>
+                </h4>
+                
+                <template x-for="(soal, index) in soalList" :key="'soal-' + index">
+                    <div class="border-2 border-gray-200 rounded-2xl p-5 hover:shadow-lg transition-all bg-gradient-to-r from-gray-50 to-white">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <span class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg" x-text="index + 1"></span>
+                                <span class="px-3 py-1 text-xs font-bold rounded-full" 
+                                      :class="soal.tipe === 'pg' ? 'bg-blue-100 text-blue-700 border-2 border-blue-300' : 'bg-purple-100 text-purple-700 border-2 border-purple-300'" 
+                                      x-text="soal.tipe === 'pg' ? 'PILIHAN GANDA' : 'ESSAY'"></span>
+                            </div>
+                            <button type="button" @click="hapusSoal(index)" class="text-red-600 hover:text-red-700 text-sm font-bold flex items-center gap-1 px-3 py-1 rounded-lg hover:bg-red-50">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </div>
+                        
+                        <p class="text-gray-900 font-bold text-base mb-3" x-text="soal.pertanyaan"></p>
+                        
+                        <template x-if="soal.gambarSoal">
+                            <img :src="soal.gambarSoal" class="max-h-64 rounded-xl border-2 border-gray-200 shadow-md mb-3">
+                        </template>
+                        
+                        <template x-if="soal.tipe === 'pg'">
+                            <div class="space-y-2">
+                                <template x-for="(opsi, idx) in soal.opsi" :key="'opsi-' + idx">
+                                    <div>
+                                        <div class="flex items-center gap-3 p-2 rounded-lg" 
+                                             :class="String.fromCharCode(65 + idx) === soal.jawaban ? 'bg-green-50 border-2 border-green-300' : 'bg-white border-2 border-gray-200'">
+                                            <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" 
+                                                  :class="String.fromCharCode(65 + idx) === soal.jawaban ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'" 
+                                                  x-text="String.fromCharCode(65 + idx)"></span>
+                                            <span class="flex-1 text-sm text-gray-700" x-text="opsi.teks"></span>
+                                            <span x-show="String.fromCharCode(65 + idx) === soal.jawaban" class="text-green-600 font-bold text-xs">✓ Benar</span>
+                                        </div>
+                                        <template x-if="opsi.gambar">
+                                            <img :src="opsi.gambar" class="max-h-32 rounded-lg border-2 border-gray-200 shadow-sm ml-10 mt-1 mb-2">
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        
+                        <template x-if="soal.tipe === 'essay'">
+                            <div class="mt-3 p-3 bg-purple-50 border-2 border-purple-200 rounded-xl">
+                                <p class="text-xs font-bold text-purple-700 mb-1">💡 Kunci Jawaban:</p>
+                                <p class="text-sm text-gray-800" x-text="soal.jawaban"></p>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                
+                <div x-show="soalList.length === 0" class="p-8 bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-dashed border-gray-300 rounded-2xl text-center">
+                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-clipboard-list text-3xl text-gray-400"></i>
+                    </div>
+                    <p class="text-gray-600 font-semibold">Belum ada soal</p>
+                    <p class="text-sm text-gray-500 mt-1">Silakan buat soal pertama Anda di form atas ☝️</p>
+                </div>
+            </div>
         </div>
 
         <!-- Hidden inputs container -->
@@ -402,6 +407,9 @@
 </div>
 
 <script>
+// 🔥 VARIABLE GLOBAL UNTUK BACKUP DATA SOAL
+window.soalListData = [];
+
 function ujianForm() {
     return {
         mode: 'latihan',
@@ -443,7 +451,7 @@ function ujianForm() {
                 }
             }
             
-            this.soalList.push({
+            const soalBaru = {
                 tipe: this.currentSoal.tipe,
                 level: this.currentSoal.level,
                 pertanyaan: this.currentSoal.pertanyaan,
@@ -455,15 +463,26 @@ function ujianForm() {
                     { teks: this.currentSoal.opsi[3].teks, gambar: this.currentSoal.opsi[3].gambar }
                 ] : [],
                 jawaban: this.currentSoal.jawaban
-            });
+            };
+            
+            this.soalList.push(soalBaru);
+            window.soalListData = JSON.parse(JSON.stringify(this.soalList));
             
             this.resetForm();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // 🔥 SCROLL KE FORM (DI ATAS) - BUKAN KE TOP
+            setTimeout(() => {
+                const formElement = document.getElementById('formTambahSoal');
+                if (formElement) {
+                    formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
         },
         
         hapusSoal(index) {
             if (confirm('Yakin ingin hapus soal ini?')) {
                 this.soalList.splice(index, 1);
+                window.soalListData = JSON.parse(JSON.stringify(this.soalList));
             }
         },
         
@@ -516,24 +535,50 @@ function ujianForm() {
     }
 }
 
+// 🔥 FUNGSI SUBMIT - PAKAI VARIABLE GLOBAL SEBAGAI BACKUP
 function submitUjianForm() {
-    const app = Alpine.$data(document.querySelector('[x-data]'));
+    let soalList = [];
     
-    if (app.soalList.length === 0) {
+    try {
+        const app = Alpine.$data(document.querySelector('[x-data]'));
+        if (app && app.soalList) {
+            soalList = app.soalList;
+        }
+    } catch (e) {
+        console.log('Alpine.$data error, pakai backup:', e);
+    }
+    
+    if (!soalList || soalList.length === 0) {
+        soalList = window.soalListData || [];
+    }
+    
+    if (soalList.length === 0) {
         alert('❌ Minimal 1 soal harus ditambahkan!');
+        return;
+    }
+    
+    const judul = document.querySelector('input[name="judul"]');
+    if (!judul || !judul.value.trim()) {
+        alert('❌ Judul ujian harus diisi!');
+        return;
+    }
+    
+    const mapelId = document.querySelector('select[name="mapel_id"]');
+    if (!mapelId || !mapelId.value) {
+        alert('❌ Mata pelajaran harus dipilih!');
         return;
     }
     
     const container = document.getElementById('soalInputsContainer');
     container.innerHTML = '';
     
-    app.soalList.forEach((soal, index) => {
+    soalList.forEach((soal, index) => {
         addHiddenInput(container, `soal_list[${index}][tipe]`, soal.tipe);
         addHiddenInput(container, `soal_list[${index}][level]`, soal.level);
         addHiddenInput(container, `soal_list[${index}][pertanyaan]`, soal.pertanyaan);
         addHiddenInput(container, `soal_list[${index}][jawaban]`, soal.jawaban);
         
-        if (soal.tipe === 'pg') {
+        if (soal.tipe === 'pg' && soal.opsi) {
             soal.opsi.forEach((opsi, opsiIndex) => {
                 const label = String.fromCharCode(65 + opsiIndex);
                 addHiddenInput(container, `soal_list[${index}][opsi][${label}]`, opsi.teks);
@@ -541,14 +586,19 @@ function submitUjianForm() {
         }
     });
     
-    document.getElementById('ujianForm').submit();
+    const form = document.getElementById('ujianForm');
+    if (form) {
+        form.submit();
+    } else {
+        alert('❌ Form tidak ditemukan!');
+    }
 }
 
 function addHiddenInput(container, name, value) {
     const input = document.createElement('input');
     input.type = 'hidden';
     input.name = name;
-    input.value = value;
+    input.value = value || '';
     container.appendChild(input);
 }
 </script>

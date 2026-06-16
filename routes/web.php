@@ -14,6 +14,10 @@ use App\Http\Controllers\AiGenerateController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\HasilUjianController;
 
+// ✅ IMPORT UNTUK LATIHAN & PAKET LATIHAN CONTROLLER
+use App\Http\Controllers\Siswa\LatihanController;
+use App\Http\Controllers\Guru\PaketLatihanController;
+
 /*
 |--------------------------------------------------------------------------
 | AUTH ROUTES
@@ -31,6 +35,7 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('l
 
 // Logout (POST)
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
 /*
 |--------------------------------------------------------------------------
 | PROFILE ROUTES (Semua Role)
@@ -118,6 +123,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/ujian/{ujianId}/hasil/{siswaId}', [HasilUjianController::class, 'detail'])->name('ujian.hasil.detail');
         Route::get('/ujian/{id}/hasil/export', [HasilUjianController::class, 'export'])->name('ujian.hasil.export');
         
+        // Rekap Nilai & Export
+        Route::get('/ujian/{id}/rekap', [HasilUjianController::class, 'rekap'])->name('ujian.rekap');
+        Route::get('/ujian/{id}/export', [HasilUjianController::class, 'exportExcel'])->name('ujian.export');
+        
         // API untuk load soal (AJAX)
         Route::get('/api/soal/mapel/{mapelId}', [UjianController::class, 'getSoalByMapel'])->name('api.soal.mapel');
         
@@ -125,28 +134,44 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/ai-generate', [AiGenerateController::class, 'index'])->name('ai-generate.index');
         Route::post('/ai-generate', [AiGenerateController::class, 'generate'])->name('ai-generate.generate');
         Route::post('/ai-generate/save', [AiGenerateController::class, 'save'])->name('ai-generate.save');
+
+        // Paket Latihan (Guru)
+        Route::get('/paket-latihan', [PaketLatihanController::class, 'index'])->name('guru.paket-latihan.index');
+        Route::get('/paket-latihan/create', [PaketLatihanController::class, 'create'])->name('guru.paket-latihan.create');
+        Route::post('/paket-latihan', [PaketLatihanController::class, 'store'])->name('guru.paket-latihan.store');
+        Route::get('/paket-latihan/{id}/edit', [PaketLatihanController::class, 'edit'])->name('guru.paket-latihan.edit');
+        Route::put('/paket-latihan/{id}', [PaketLatihanController::class, 'update'])->name('guru.paket-latihan.update');
+        Route::delete('/paket-latihan/{id}', [PaketLatihanController::class, 'destroy'])->name('guru.paket-latihan.destroy');
+        Route::get('/paket-latihan/{id}/kelola-soal', [PaketLatihanController::class, 'kelolaSoal'])->name('guru.paket-latihan.kelola-soal');
+        Route::post('/paket-latihan/{id}/tambah-soal', [PaketLatihanController::class, 'tambahSoal'])->name('guru.paket-latihan.tambah-soal');
+        Route::delete('/paket-latihan/{id}/hapus-soal/{soalId}', [PaketLatihanController::class, 'hapusSoal'])->name('guru.paket-latihan.hapus-soal');
     });
     
     // ========== SISWA ROUTES ==========
-Route::middleware('role:siswa')->group(function () {
-    Route::get('/siswa/dashboard', [SiswaDashboardController::class, 'index'])->name('siswa.dashboard');
-    
-    // Ujian (Siswa)
-    Route::get('/siswa/ujian', [UjianController::class, 'daftarUjian'])->name('siswa.ujian.daftar');
-    Route::get('/siswa/ujian/{ujianId}/kerjakan', [UjianController::class, 'kerjakan'])->name('siswa.ujian.kerjakan');
-    Route::post('/siswa/ujian/{ujianId}/simpan', [UjianController::class, 'simpanJawaban'])->name('siswa.ujian.simpan');
-    Route::post('/siswa/ujian/{ujianId}/submit', [UjianController::class, 'submitUjian'])->name('siswa.ujian.submit');
-    
-    // 🔥 FIX: Path berbeda dari guru!
-    Route::get('/siswa/hasil/{ujianId}', [UjianController::class, 'hasil'])->name('siswa.ujian.hasil');
-    
-    // Riwayat Ujian Siswa
-    Route::get('/siswa/riwayat', [UjianController::class, 'riwayat'])->name('siswa.riwayat');
-    
-    // Menu Placeholder
-    Route::get('/siswa/belajar', function () { return view('siswa.belajar'); })->name('siswa.belajar');
-    Route::get('/siswa/ai-mentor', function () { return view('siswa.ai-mentor'); })->name('siswa.ai-mentor');
-    Route::get('/siswa/badge', function () { return view('siswa.badge'); })->name('siswa.badge');
-    Route::get('/siswa/leaderboard', function () { return view('siswa.leaderboard'); })->name('siswa.leaderboard');
-});
+    Route::middleware('role:siswa')->group(function () {
+        Route::get('/siswa/dashboard', [SiswaDashboardController::class, 'index'])->name('siswa.dashboard');
+        
+        // Ujian (Siswa)
+        Route::get('/siswa/ujian', [UjianController::class, 'daftarUjian'])->name('siswa.ujian.daftar');
+        Route::get('/siswa/ujian/{ujianId}/kerjakan', [UjianController::class, 'kerjakan'])->name('siswa.ujian.kerjakan');
+        Route::post('/siswa/ujian/{ujianId}/simpan', [UjianController::class, 'simpanJawaban'])->name('siswa.ujian.simpan');
+        Route::post('/siswa/ujian/{ujianId}/submit', [UjianController::class, 'submitUjian'])->name('siswa.ujian.submit');
+        Route::get('/siswa/hasil/{ujianId}', [UjianController::class, 'hasil'])->name('siswa.ujian.hasil');
+        
+        // Riwayat Ujian Siswa
+        Route::get('/siswa/riwayat', [UjianController::class, 'riwayat'])->name('siswa.riwayat');
+        
+        // Latihan Soal (Paket Latihan untuk Siswa)
+        Route::get('/siswa/latihan', [LatihanController::class, 'index'])->name('siswa.latihan.index');
+        Route::get('/siswa/latihan/{paketId}/kerjakan', [LatihanController::class, 'kerjakan'])->name('siswa.latihan.kerjakan');
+        Route::post('/siswa/latihan/submit', [LatihanController::class, 'submit'])->name('siswa.latihan.submit');
+        Route::get('/siswa/latihan/{paketId}/histori', [LatihanController::class, 'histori'])->name('siswa.latihan.histori'); // ✅ BARU
+        
+        // Menu Placeholder
+        Route::get('/siswa/belajar', function () { return view('siswa.belajar'); })->name('siswa.belajar');
+        Route::get('/siswa/ai-mentor', function () { return view('siswa.ai-mentor'); })->name('siswa.ai-mentor');
+        Route::get('/siswa/badge', function () { return view('siswa.badge'); })->name('siswa.badge');
+        Route::get('/siswa/leaderboard', function () { return view('siswa.leaderboard'); })->name('siswa.leaderboard');
+    });
+
 });

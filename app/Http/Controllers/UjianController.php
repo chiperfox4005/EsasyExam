@@ -16,105 +16,126 @@ class UjianController extends Controller
 {
     // ========== GURU & ADMIN ==========
     
+    /**
+     * ✅ HELPER: Ambil mapel yang bisa diakses guru ini
+     * Rumus: Mapel milik guru + Mapel global (guru_id NULL)
+     */
+    private function getAccessibleMapel()
+    {
+        return MataPelajaran::where(function($query) {
+                $query->where('guru_id', Auth::id())
+                      ->orWhereNull('guru_id');
+            })
+            ->orderBy('nama')
+            ->get();
+    }
+    
     public function index()
     {
         $ujian = Ujian::where('guru_id', Auth::id())
             ->with(['mapel', 'soalUjian'])
             ->latest()
             ->paginate(10);
-            
-        $mapelList = MataPelajaran::where('guru_id', Auth::id())->get();
-        if ($mapelList->isEmpty()) {
-            $mapelList = MataPelajaran::all();
-        }
         
-        $kelasList = Kelas::all();
+        // ✅ FIX: Pakai helper untuk konsistensi
+        $mapelList = $this->getAccessibleMapel();
+        $kelasList = Kelas::orderBy('nama')->get();
         
         return view('ujian.index', compact('ujian', 'mapelList', 'kelasList'));
     }
 
     public function create()
-{
-    // ✅ AMBIL SEMUA MAPEL UNTUK GURU
-    $mapelList = MataPelajaran::where('guru_id', Auth::id())
-        ->orderBy('nama')
-        ->get();
-    
-    // ✅ AMBIL SEMUA KELAS
-    $kelasList = Kelas::orderBy('nama')->get();
-    
-    return view('ujian.create', compact('mapelList', 'kelasList'));
-}
-
-    public function store(Request $request)
-{
-    $rules = [
-        'judul' => 'required|string|max:255',
-        'mapel_id' => 'required|exists:mata_pelajarans,id',
-        'mode' => 'required|in:latihan,ujian',
-        'tipe' => 'required|in:quiz,uts,uas,latihan',
-    ];
-
-    if ($request->mode === 'ujian') {
-        $rules['durasi_menit'] = 'required|integer|min:1';
+    {
+        // ✅ FIX: Ambil mapel milik guru + mapel global (SINKRON dengan /mapel)
+        $mapelList = $this->getAccessibleMapel();
+        $kelasList = Kelas::orderBy('nama')->get();
+        
+        return view('ujian.create', compact('mapelList', 'kelasList'));
     }
+    
+    public function store(Request $request)
+    {
+        // ✅ FIX: Validasi mapel harus bisa diakses guru ini
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'mapel_id' => ['required', function($attribute, $value, $fail) {
+                $exists = MataPelajaran::where('id', $value)
+                    ->where(function($query) {
+                        $query->where('guru_id', Auth::id())
+                              ->orWhereNull('guru_id');
+                    })->exists();
+                
+                if (!$exists) {
+                    $fail('Mata pelajaran tidak valid atau bukan milik Anda.');
+                }
+            }],
+            'mode' => 'required|in:latihan,ujian',
+            'tipe' => 'required|in:quiz,uts,uas,latihan',
+        ]);
 
-    $request->validate($rules);
-
-    // Create ujian
-    $ujian = Ujian::create([
-        'guru_id' => Auth::id(),
-        'mapel_id' => $request->mapel_id,
-        'kelas_id' => $request->kelas_id ?: null,
-        'judul' => $request->judul,
-        'tipe' => $request->tipe,
-        'mode' => $request->mode,
-        'durasi_menit' => $request->mode === 'ujian' ? ($request->durasi_menit ?? 60) : 0,
-        'mulai_at' => $request->mode === 'ujian' ? ($request->mulai_at ?? now()) : now(),
-        'selesai_at' => $request->mode === 'ujian' ? ($request->selesai_at ?? now()->addDays(7)) : now()->addYear(),
-        'status' => 'published',
-        'acak_soal' => $request->has('acak_soal'),
-        'acak_opsi' => $request->has('acak_opsi'),
-        'tampilkan_nilai' => $request->has('tampilkan_nilai'),
-        'deteksi_tab_switch' => $request->has('deteksi_tab_switch'),
-        'boleh_copy_paste' => $request->has('boleh_copy_paste'),
-        'izinkan_upload_gambar_essay' => $request->has('izinkan_upload_gambar_essay'),
-        'max_attempts' => $request->mode === 'ujian' ? ($request->max_attempts ?? 3) : 1,
-    ]);
-
-    // 🔥 SIMPAN SOAL DARI FORM (FORMAT BARU)
-    if ($request->has('soal_list') && is_array($request->soal_list)) {
-        foreach ($request->soal_list as $soalData) {
-            // Buat soal di bank soal dulu
-            $bankSoal = BankSoal::create([
-                'guru_id' => Auth::id(),
-                'mapel_id' => $request->mapel_id,
-                'tipe' => $soalData['tipe'],
-                'pertanyaan' => $soalData['pertanyaan'],
-                'level' => $soalData['level'],
-                'status' => 'published',
-                'opsi_a' => $soalData['opsi']['A'] ?? null,
-                'opsi_b' => $soalData['opsi']['B'] ?? null,
-                'opsi_c' => $soalData['opsi']['C'] ?? null,
-                'opsi_d' => $soalData['opsi']['D'] ?? null,
-                'jawaban' => $soalData['jawaban'] ?? null,
-                'opsi_a_tipe' => 'text',
-                'opsi_b_tipe' => 'text',
-                'opsi_c_tipe' => 'text',
-                'opsi_d_tipe' => 'text',
-            ]);
-            
-            // Link ke ujian
-            $ujian->soalUjian()->create([
-                'soal_id' => $bankSoal->id,
-                'bobot' => 1,
+        if ($request->mode === 'ujian') {
+            $request->validate([
+                'durasi_menit' => 'required|integer|min:1',
             ]);
         }
-    }
 
-    return redirect()->route('ujian.index')
-        ->with('success', 'Ujian berhasil dibuat dengan ' . count($request->soal_list ?? []) . ' soal!');
-}
+        // Create ujian
+        $ujian = Ujian::create([
+            'guru_id' => Auth::id(),
+            'mapel_id' => $request->mapel_id,
+            'kelas_id' => $request->kelas_id ?: null,
+            'judul' => $request->judul,
+            'tipe' => $request->tipe,
+            'mode' => $request->mode,
+            'durasi_menit' => $request->mode === 'ujian' ? ($request->durasi_menit ?? 60) : 0,
+            'mulai_at' => $request->mode === 'ujian' ? ($request->mulai_at ?? now()) : now(),
+            'selesai_at' => $request->mode === 'ujian' ? ($request->selesai_at ?? now()->addDays(7)) : now()->addYear(),
+            'status' => 'published',
+            'acak_soal' => $request->has('acak_soal') ? 1 : 0,
+            'acak_opsi' => $request->has('acak_opsi') ? 1 : 0,
+            'tampilkan_nilai' => $request->has('tampilkan_nilai') ? 1 : 0,
+            'deteksi_tab_switch' => $request->has('deteksi_tab_switch') ? 1 : 0,
+            'boleh_copy_paste' => $request->has('boleh_copy_paste') ? 1 : 0,
+            'izinkan_upload_gambar_essay' => $request->has('izinkan_upload_gambar_essay') ? 1 : 0,
+            'max_attempts' => $request->mode === 'ujian' ? ($request->max_attempts ?? 3) : 1,
+        ]);
+
+        // SIMPAN SOAL - PAKAI bank_soal_id (BUKAN soal_id)
+        $jumlahSoal = 0;
+        if ($request->has('soal_list') && is_array($request->soal_list)) {
+            foreach ($request->soal_list as $soalData) {
+                // Buat soal di bank soal
+                $bankSoal = BankSoal::create([
+                    'guru_id' => Auth::id(),
+                    'mapel_id' => $request->mapel_id,
+                    'tipe' => $soalData['tipe'] ?? 'pg',
+                    'pertanyaan' => $soalData['pertanyaan'] ?? '',
+                    'level' => $soalData['level'] ?? 'sedang',
+                    'status' => 'published',
+                    'opsi_a' => $soalData['opsi']['A'] ?? null,
+                    'opsi_b' => $soalData['opsi']['B'] ?? null,
+                    'opsi_c' => $soalData['opsi']['C'] ?? null,
+                    'opsi_d' => $soalData['opsi']['D'] ?? null,
+                    'jawaban' => $soalData['jawaban'] ?? null,
+                    'opsi_a_tipe' => 'text',
+                    'opsi_b_tipe' => 'text',
+                    'opsi_c_tipe' => 'text',
+                    'opsi_d_tipe' => 'text',
+                ]);
+                
+                // Pakai bank_soal_id (BUKAN soal_id)
+                $ujian->soalUjian()->create([
+                    'bank_soal_id' => $bankSoal->id,
+                    'bobot' => 1,
+                ]);
+                $jumlahSoal++;
+            }
+        }
+
+        return redirect()->route('ujian.index')
+            ->with('success', "Ujian berhasil dibuat dengan {$jumlahSoal} soal!");
+    }
+    
     public function destroy($id)
     {
         $ujian = Ujian::where('guru_id', Auth::id())->findOrFail($id);
@@ -125,9 +146,24 @@ class UjianController extends Controller
 
     public function getSoalByMapel($mapelId)
     {
+        // ✅ FIX: Pastikan mapel bisa diakses guru ini
+        $mapel = MataPelajaran::where('id', $mapelId)
+            ->where(function($query) {
+                $query->where('guru_id', Auth::id())
+                      ->orWhereNull('guru_id');
+            })
+            ->first();
+        
+        if (!$mapel) {
+            return response()->json(['error' => 'Mapel tidak valid'], 403);
+        }
+        
         $soal = BankSoal::where('mapel_id', $mapelId)
             ->where('status', 'published')
-            ->where('guru_id', Auth::id())
+            ->where(function($query) {
+                $query->where('guru_id', Auth::id())
+                      ->orWhereNull('guru_id');
+            })
             ->get();
             
         return response()->json($soal);
@@ -137,83 +173,130 @@ class UjianController extends Controller
     
     // Daftar ujian untuk siswa
     public function daftarUjian()
-{
-    $siswa = Auth::user();
-    $now = now();
+    {
+        $siswa = Auth::user();
+        $now = now();
+        
+        // Ambil semua ujian yang tersedia untuk siswa ini
+        $ujianList = Ujian::with(['mapel', 'soalUjian'])
+            ->where('status', 'published')
+            ->where('mulai_at', '<=', $now)
+            ->where('selesai_at', '>=', $now)
+            ->where(function($q) use ($siswa) {
+                $q->whereNull('kelas_id')
+                  ->orWhere('kelas_id', $siswa->kelas_id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function($ujian) use ($siswa) {
+                // Cek apakah siswa sudah mengerjakan
+                $hasil = HasilUjian::where('ujian_id', $ujian->id)
+                    ->where('siswa_id', $siswa->id)
+                    ->first();
+                
+                $ujian->sudah_dikerjakan = $hasil !== null;
+                $ujian->rata_rata_nilai = $hasil ? $hasil->nilai : null;
+                
+                return $ujian;
+            });
+        
+        return view('siswa.ujian.daftar', compact('ujianList'));
+    }
     
-    // Ambil semua ujian yang tersedia untuk siswa ini
-    $ujianList = Ujian::with(['mapel', 'soalUjian'])
-        ->where('status', 'published')
-        ->where('mulai_at', '<=', $now)
-        ->where('selesai_at', '>=', $now)
-        ->where(function($q) use ($siswa) {
-            $q->whereNull('kelas_id')
-              ->orWhere('kelas_id', $siswa->kelas_id);
-        })
-        ->orderBy('created_at', 'desc')
-        ->get()
-        ->map(function($ujian) use ($siswa) {
-            // Cek apakah siswa sudah mengerjakan
-            $hasil = HasilUjian::where('ujian_id', $ujian->id)
-                ->where('siswa_id', $siswa->id)
-                ->first();
-            
-            $ujian->sudah_dikerjakan = $hasil !== null;
-            $ujian->rata_rata_nilai = $hasil ? $hasil->nilai : null;
-            
-            return $ujian;
-        });
-    
-    return view('siswa.ujian.daftar', compact('ujianList'));
-}
-    // Mengerjakan ujian
     public function kerjakan($ujianId)
+{
+    $ujian = Ujian::findOrFail($ujianId);
+    $siswa = Auth::user();
+    
+    // ✅ CEK MAX ATTEMPTS
+    $jumlahPercobaan = HasilUjian::where('ujian_id', $ujianId)
+        ->where('siswa_id', $siswa->id)
+        ->count();
+    
+    if ($ujian->max_attempts > 0 && $jumlahPercobaan >= $ujian->max_attempts) {
+        return redirect()->route('siswa.ujian.daftar')
+            ->with('error', "Anda sudah mencapai batas maksimal percobaan ({$ujian->max_attempts}x).");
+    }
+    
+    // Cek apakah sudah pernah mengerjakan dan status submitted
+    $hasil = HasilUjian::where('ujian_id', $ujianId)
+        ->where('siswa_id', $siswa->id)
+        ->where('status', 'submitted')
+        ->first();
+    
+    if ($hasil) {
+        return redirect()->route('siswa.ujian.hasil', $ujianId);
+    }
+    
+    // Ambil soal dengan pengacakan jika diaktifkan
+    $soalQuery = SoalUjian::where('ujian_id', $ujianId)->with('soal');
+    
+    if ($ujian->acak_soal) {
+        $soalQuery->inRandomOrder();
+    } else {
+        $soalQuery->orderBy('urutan');
+    }
+    
+    $soalList = $soalQuery->get();
+    
+    // Jika belum ada record hasil, buat baru
+    if (!$hasil) {
+        $hasil = HasilUjian::create([
+            'ujian_id' => $ujianId,
+            'siswa_id' => $siswa->id,
+            'mulai_mengerjakan' => now(),
+            'status' => 'ongoing'
+        ]);
+    }
+    
+    // Hitung waktu sisa
+    $waktuSisa = 0;
+    if ($ujian->mode === 'ujian') {
+        $endTime = Carbon::parse($hasil->mulai_mengerjakan)->addMinutes($ujian->durasi_menit);
+        $waktuSisa = max(0, now()->diffInSeconds($endTime));
+    }
+    
+    return view('siswa.ujian.kerjakan', compact('ujian', 'soalList', 'hasil', 'waktuSisa'));
+}
+    // Simpan jawaban
+    public function simpanJawaban(Request $request, $ujianId)
     {
         $ujian = Ujian::findOrFail($ujianId);
         $siswa = Auth::user();
         
-        // Cek apakah sudah pernah mengerjakan
         $hasil = HasilUjian::where('ujian_id', $ujianId)
             ->where('siswa_id', $siswa->id)
-            ->first();
+            ->firstOrFail();
         
-        if ($hasil && $hasil->status === 'submitted') {
-            return redirect()->route('siswa.ujian.hasil', $ujianId);
+        $jawaban = $hasil->jawaban ?? [];
+        
+        // Merge jawaban PG baru
+        if ($request->has('jawaban')) {
+            foreach ($request->jawaban as $soalId => $nilai) {
+                $jawaban[$soalId] = $nilai;
+            }
         }
         
-        // Ambil soal dengan pengacakan jika diaktifkan
-        $soalQuery = SoalUjian::where('ujian_id', $ujianId)->with('soal');
-        
-        if ($ujian->acak_soal) {
-            $soalQuery->inRandomOrder();
-        } else {
-            $soalQuery->orderBy('urutan');
+        // Handle upload gambar essay
+        if ($request->hasFile('jawaban_gambar')) {
+            $gambarPaths = $hasil->jawaban_gambar ?? [];
+            
+            foreach ($request->jawaban_gambar as $soalId => $file) {
+                if ($file->isValid()) {
+                    $path = $file->store('jawaban-essay', 'public');
+                    $gambarPaths[$soalId] = $path;
+                }
+            }
+            
+            $hasil->jawaban_gambar = $gambarPaths;
         }
         
-        $soalList = $soalQuery->get();
+        $hasil->update(['jawaban' => $jawaban]);
         
-        // Jika belum ada record hasil, buat baru
-        if (!$hasil) {
-            $hasil = HasilUjian::create([
-                'ujian_id' => $ujianId,
-                'siswa_id' => $siswa->id,
-                'mulai_mengerjakan' => now(),
-                'status' => 'ongoing'
-            ]);
-        }
-        
-        // Hitung waktu sisa
-        $waktuSisa = 0;
-        if ($ujian->mode === 'ujian') {
-            $endTime = Carbon::parse($hasil->mulai_mengerjakan)->addMinutes($ujian->durasi_menit);
-            $waktuSisa = max(0, now()->diffInSeconds($endTime));
-        }
-        
-        return view('siswa.ujian.kerjakan', compact('ujian', 'soalList', 'hasil', 'waktuSisa'));
+        return response()->json(['success' => true]);
     }
     
-    // Simpan jawaban
-    public function simpanJawaban(Request $request, $ujianId)
+    public function submitUjian(Request $request, $ujianId)
 {
     $ujian = Ujian::findOrFail($ujianId);
     $siswa = Auth::user();
@@ -222,66 +305,44 @@ class UjianController extends Controller
         ->where('siswa_id', $siswa->id)
         ->firstOrFail();
     
-    $jawaban = $hasil->jawaban ?? [];
+    // ✅ Hitung benar/salah/kosong
+    $soalList = SoalUjian::where('ujian_id', $ujianId)->with('soal')->get();
+    $benar = 0;
+    $salah = 0;
+    $kosong = 0;
     
-    // Merge jawaban PG baru
-    if ($request->has('jawaban')) {
-        foreach ($request->jawaban as $soalId => $nilai) {
-            $jawaban[$soalId] = $nilai;
-        }
-    }
-    
-    // Handle upload gambar essay
-    if ($request->hasFile('jawaban_gambar')) {
-        $gambarPaths = $hasil->jawaban_gambar ?? [];
+    foreach ($soalList as $soalUjian) {
+        $soal = $soalUjian->soal;
+        $jawabanSiswa = $hasil->jawaban[$soal->id] ?? null;
         
-        foreach ($request->jawaban_gambar as $soalId => $file) {
-            if ($file->isValid()) {
-                $path = $file->store('jawaban-essay', 'public');
-                $gambarPaths[$soalId] = $path;
+        if (!$jawabanSiswa) {
+            $kosong++;
+        } elseif ($soal->tipe === 'pg') {
+            if ($jawabanSiswa === $soal->jawaban) {
+                $benar++;
+            } else {
+                $salah++;
             }
+        } else {
+            $kosong++; // Essay dianggap kosong untuk auto-grading
         }
-        
-        $hasil->jawaban_gambar = $gambarPaths;
     }
     
-    $hasil->update(['jawaban' => $jawaban]);
+    $totalSoal = $soalList->count();
+    $nilai = $totalSoal > 0 ? ($benar / $totalSoal) * 100 : 0;
     
-    return response()->json(['success' => true]);
-}
-    // Submit ujian
-    public function submitUjian(Request $request, $ujianId)
-{
-    $ujian = Ujian::findOrFail($ujianId);
-    $siswa = Auth::user();
-    
-    // Cek apakah siswa sudah mengerjakan
-    $hasil = HasilUjian::where('ujian_id', $ujianId)
-        ->where('siswa_id', $siswa->id)
-        ->first();
-    
-    if (!$hasil) {
-        return redirect()->route('siswa.ujian.daftar')
-            ->with('error', 'Anda belum mengerjakan ujian ini.');
-    }
-    
-    // Update tracking data
+    // ✅ Update hasil dengan data tracking
     $hasil->update([
-        'submitted_at' => now(),
         'status' => 'submitted',
-        'tab_switch_count' => $request->tab_switch_count ?? 0,
-        'copy_count' => $request->copy_count ?? 0,
-        'paste_count' => $request->paste_count ?? 0,
-        'right_click_count' => $request->right_click_count ?? 0,
-        'blur_count' => $request->blur_count ?? 0,
+        'benar' => $benar,
+        'salah' => $salah,
+        'kosong' => $kosong,
+        'nilai' => $nilai,
+        'submitted_at' => now(),
+        // Tracking sudah tersimpan otomatis via JavaScript saat ujian
     ]);
     
-    // Auto-grading
-    $this->gradeUjian($ujian, $hasil);
-    
-    // 🔥 PENTING: Redirect ke route SISWA, bukan guru!
-    return redirect()->route('siswa.ujian.hasil', ['ujianId' => $ujianId])
-        ->with('success', 'Ujian berhasil dikumpulkan!');
+    return redirect()->route('siswa.ujian.hasil', $ujianId);
 }
     // Auto-grading
     private function gradeUjian($ujian, $hasil)
@@ -325,26 +386,50 @@ class UjianController extends Controller
         ]);
     }
     
-    // Lihat hasil
-    public function hasil($ujianId)
-    {
-        $ujian = Ujian::findOrFail($ujianId);
-        $siswa = Auth::user();
-        
-        $hasil = HasilUjian::where('ujian_id', $ujianId)
-            ->where('siswa_id', $siswa->id)
-            ->firstOrFail();
-        
-        // Ambil soal untuk review (jika diizinkan)
-        $soalList = null;
-        if ($ujian->tampilkan_nilai || $ujian->mode === 'latihan') {
-            $soalQuery = SoalUjian::where('ujian_id', $ujianId)->with('soal');
-            $soalList = $soalQuery->get();
-        }
-        
-        return view('siswa.ujian.hasil', compact('ujian', 'hasil', 'soalList'));
+public function hasil($ujianId)
+{
+    $ujian = Ujian::findOrFail($ujianId);
+    $siswa = Auth::user();
+    
+    $hasil = HasilUjian::where('ujian_id', $ujianId)
+        ->where('siswa_id', $siswa->id)
+        ->firstOrFail();
+    
+    // ✅ Hitung waktu pengerjaan
+    $waktuPengerjaan = null;
+    if ($hasil->mulai_mengerjakan && $hasil->submitted_at) {
+        $diff = \Carbon\Carbon::parse($hasil->mulai_mengerjakan)
+            ->diff(\Carbon\Carbon::parse($hasil->submitted_at));
+        $waktuPengerjaan = sprintf(
+            '%d jam %d menit %d detik',
+            $diff->h,
+            $diff->i,
+            $diff->s
+        );
     }
     
+    // ✅ Ambil soal untuk review
+    $soalList = null;
+    if ($ujian->tampilkan_nilai || $ujian->mode === 'latihan') {
+        $soalQuery = SoalUjian::where('ujian_id', $ujianId)->with('soal');
+        
+        if ($ujian->acak_soal) {
+            $soalQuery->inRandomOrder();
+        } else {
+            $soalQuery->orderBy('urutan');
+        }
+        
+        $soalList = $soalQuery->get();
+    }
+    
+    // ✅ PASTIKAN SEMUA VARIABEL DIKIRIM
+    return view('siswa.ujian.hasil', compact(
+        'ujian', 
+        'hasil', 
+        'soalList', 
+        'waktuPengerjaan'
+    ));
+}
     // ========== HELPER METHODS ==========
     
     /**
@@ -381,62 +466,76 @@ class UjianController extends Controller
         
         return $opsi;
     }
+    
     public function riwayat()
-{
-    $siswa = Auth::user();
-    
-    $hasilList = HasilUjian::where('siswa_id', $siswa->id)
-        ->with('ujian.mapel')
-        ->latest()
-        ->paginate(15);
-    
-    return view('siswa.riwayat', compact('hasilList'));
-}
-
-public function edit($id)
-{
-    $ujian = Ujian::where('guru_id', Auth::id())->findOrFail($id);
-    $mapelList = MataPelajaran::where('guru_id', Auth::id())->get();
-    $kelasList = Kelas::all();
-    
-    return view('ujian.edit', compact('ujian', 'mapelList', 'kelasList'));
-}
-
-public function update(Request $request, $id)
-{
-    $ujian = Ujian::where('guru_id', Auth::id())->findOrFail($id);
-    
-    $rules = [
-        'judul' => 'required|string|max:255',
-        'mapel_id' => 'required|exists:mata_pelajarans,id',
-        'mode' => 'required|in:latihan,ujian',
-    ];
-
-    if ($request->mode === 'ujian') {
-        $rules['durasi_menit'] = 'required|integer|min:1';
-        $rules['mulai_at'] = 'required|date';
-        $rules['selesai_at'] = 'required|date|after:mulai_at';
+    {
+        $siswa = Auth::user();
+        
+        $hasilList = HasilUjian::where('siswa_id', $siswa->id)
+            ->with('ujian.mapel')
+            ->latest()
+            ->paginate(15);
+        
+        return view('siswa.riwayat', compact('hasilList'));
     }
 
-    $request->validate($rules);
+    public function edit($id)
+    {
+        $ujian = Ujian::where('guru_id', Auth::id())->findOrFail($id);
+        
+        // ✅ FIX: Pakai helper untuk konsistensi (mapel milik guru + global)
+        $mapelList = $this->getAccessibleMapel();
+        $kelasList = Kelas::orderBy('nama')->get();
+        
+        return view('ujian.edit', compact('ujian', 'mapelList', 'kelasList'));
+    }
 
-    $ujian->update([
-        'judul' => $request->judul,
-        'mapel_id' => $request->mapel_id,
-        'kelas_id' => $request->kelas_id ?: null,
-        'durasi_menit' => $request->mode === 'ujian' ? $request->durasi_menit : 0,
-        'mulai_at' => $request->mode === 'ujian' ? $request->mulai_at : now(),
-        'selesai_at' => $request->mode === 'ujian' ? $request->selesai_at : now()->addYear(),
-        'tipe' => $request->tipe ?? 'quiz',
-        'mode' => $request->mode,
-        'status' => $request->status ?? 'published',
-        'acak_soal' => $request->has('acak_soal'),
-        'acak_opsi' => $request->has('acak_opsi'),
-        'tampilkan_nilai' => $request->has('tampilkan_nilai'),
-        'boleh_copy_paste' => $request->has('boleh_copy_paste'),
-        'deteksi_tab_switch' => $request->has('deteksi_tab_switch'),
-    ]);
+    public function update(Request $request, $id)
+    {
+        $ujian = Ujian::where('guru_id', Auth::id())->findOrFail($id);
+        
+        // ✅ FIX: Validasi mapel harus bisa diakses guru ini
+        $rules = [
+            'judul' => 'required|string|max:255',
+            'mapel_id' => ['required', function($attribute, $value, $fail) {
+                $exists = MataPelajaran::where('id', $value)
+                    ->where(function($query) {
+                        $query->where('guru_id', Auth::id())
+                              ->orWhereNull('guru_id');
+                    })->exists();
+                
+                if (!$exists) {
+                    $fail('Mata pelajaran tidak valid.');
+                }
+            }],
+            'mode' => 'required|in:latihan,ujian',
+        ];
 
-    return redirect()->route('ujian.index')->with('success', 'Ujian berhasil diperbarui!');
-}
+        if ($request->mode === 'ujian') {
+            $rules['durasi_menit'] = 'required|integer|min:1';
+            $rules['mulai_at'] = 'required|date';
+            $rules['selesai_at'] = 'required|date|after:mulai_at';
+        }
+
+        $request->validate($rules);
+
+        $ujian->update([
+            'judul' => $request->judul,
+            'mapel_id' => $request->mapel_id,
+            'kelas_id' => $request->kelas_id ?: null,
+            'durasi_menit' => $request->mode === 'ujian' ? $request->durasi_menit : 0,
+            'mulai_at' => $request->mode === 'ujian' ? $request->mulai_at : now(),
+            'selesai_at' => $request->mode === 'ujian' ? $request->selesai_at : now()->addYear(),
+            'tipe' => $request->tipe ?? 'quiz',
+            'mode' => $request->mode,
+            'status' => $request->status ?? 'published',
+            'acak_soal' => $request->has('acak_soal'),
+            'acak_opsi' => $request->has('acak_opsi'),
+            'tampilkan_nilai' => $request->has('tampilkan_nilai'),
+            'boleh_copy_paste' => $request->has('boleh_copy_paste'),
+            'deteksi_tab_switch' => $request->has('deteksi_tab_switch'),
+        ]);
+
+        return redirect()->route('ujian.index')->with('success', 'Ujian berhasil diperbarui!');
+    }
 }

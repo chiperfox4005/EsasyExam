@@ -1,100 +1,118 @@
 # EsasyExam
 
-EsasyExam is a web-based examination and learning management platform designed to support digital assessment, question bank management, and AI-assisted content generation in educational environments.
+EsasyExam is a modern web-based examination and learning platform designed to streamline academic assessment, question management, and digital learning experiences.
 
-The system is built to simplify exam creation, improve question organization, and provide scalable learning workflows for administrators, teachers, and students.
+Built using Laravel and modern web technologies, EsasyExam provides an integrated environment for administrators, teachers, and students to manage educational activities efficiently through a centralized system.
 
 ---
 
-## Overview
+## Introduction
 
-EsasyExam provides an integrated environment where educational institutions can manage subjects, users, examinations, and learning activities through a modern and responsive interface.
+Educational institutions increasingly require flexible and scalable systems to support examinations, learning processes, and content management.
 
-The platform focuses on:
+EsasyExam addresses these needs by combining:
 
-* Centralized question bank management
-* Examination creation and distribution
+* Examination management
+* Centralized question banks
 * AI-assisted question generation
-* Student learning support
-* Administrative academic management
+* Learning support tools
+* User role separation
+* Responsive and modern user interfaces
+
+The platform is designed with extensibility in mind to support future educational innovations.
 
 ---
 
-## Core Features
+## Key Capabilities
 
-### Authentication & Role Management
+### User & Access Management
 
-Supports multiple user roles:
+Role-based architecture ensures controlled access across the system.
+
+Supported roles:
 
 * Administrator
 * Teacher
 * Student
 
-Each role has dedicated access permissions and dashboards.
+Each role receives dedicated dashboards and feature access.
 
 ---
 
-### Dashboard System
+## Administration Module
 
-#### Administrator Dashboard
+Administrator capabilities include:
 
-* Manage classes
-* Manage teachers
-* Manage students
-* Manage subjects
-* Monitor examinations
+* Manage academic classes
+* Manage teacher accounts
+* Manage student accounts
+* Organize subjects
+* Supervise examinations
+* Monitor platform usage
 
-#### Teacher Dashboard
+---
 
-* Create and manage question banks
-* Import questions via Excel
+## Teacher Workspace
+
+Teachers can:
+
+* Build and manage question banks
+* Create multiple-choice and essay questions
+* Upload question images
+* Categorize questions by subject and difficulty
+* Import questions from Excel
 * Generate questions using AI
-* Build examinations
-* Publish and maintain assessments
+* Create and publish examinations
 
-#### Student Dashboard
+---
 
-* Access learning materials
-* Participate in examinations
+## Student Experience
+
+Students can:
+
+* Access learning modules
+* Join examinations
+* Submit answers digitally
+* Review examination results
 * Track learning progress
 
 ---
 
-### Question Bank
+## Question Bank System
 
-Question management includes:
+Question management supports:
 
-* Multiple choice questions
-* Essay questions
-* Question categorization by subject
-* Difficulty levels
+* Multiple Choice Questions
+* Essay Questions
+* Question difficulty classification
 * Draft and publish workflow
-* Image support
 * Search and filtering
-* Excel import/export
+* Image attachments
+* Excel import support
+* AI-generated content
 
 ---
 
-### Examination Module
+## Examination System
 
-Capabilities include:
+Core examination features:
 
-* Exam creation
+* Exam scheduling
 * Subject-based question selection
-* Automatic distribution
-* Answer submission
-* Result tracking
+* Automatic question loading
+* Student answer collection
+* Result processing
 
 ---
 
-### AI Question Generator
+## AI Question Generation
 
-Integrated AI functionality enables:
+EsasyExam integrates AI-assisted workflows that enable:
 
-* Automatic question generation
-* Subject-based content generation
-* Editable generated output
-* Save generated questions directly into the question bank
+* Automatic question creation
+* Subject-aware generation
+* Editable generated outputs
+* Direct saving into question banks
 
 ---
 
@@ -116,11 +134,11 @@ Integrated AI functionality enables:
 
 * MySQL
 
-### Additional Tools
+### Additional Packages
 
 * Laravel Vite
-* PhpSpreadsheet
 * Laravel Excel
+* PhpSpreadsheet
 
 ---
 
@@ -128,10 +146,12 @@ Integrated AI functionality enables:
 
 ```plaintext
 app/
+bootstrap/
+config/
+database/
+public/
 resources/
 routes/
-public/
-database/
 storage/
 ```
 
@@ -151,14 +171,19 @@ Enter project directory:
 cd EsasyExam
 ```
 
-Install dependencies:
+Install backend dependencies:
 
 ```bash
 composer install
+```
+
+Install frontend dependencies:
+
+```bash
 npm install
 ```
 
-Create environment:
+Create environment file:
 
 ```bash
 cp .env.example .env
@@ -170,15 +195,15 @@ Generate application key:
 php artisan key:generate
 ```
 
-Configure database inside `.env`.
+Configure database credentials inside `.env`.
 
-Run migration:
+Run database migration:
 
 ```bash
 php artisan migrate
 ```
 
-Build frontend:
+Build frontend assets:
 
 ```bash
 npm run build
@@ -194,7 +219,7 @@ php artisan serve
 
 ## Development Commands
 
-Run development environment:
+Development server:
 
 ```bash
 npm run dev
@@ -216,23 +241,23 @@ php artisan migrate
 
 ## Repository
 
-GitHub Repository:
+Repository URL:
 
 https://github.com/chiperfox4005/EsasyExam
 
 ---
 
-## Roadmap
+## Future Development
 
-Planned improvements:
+Planned enhancements:
 
 * Learning analytics
-* AI performance recommendations
-* Gamification system
-* Student leaderboard
+* AI-based student recommendations
+* Gamification features
 * Badge system
+* Leaderboards
 * Real-time monitoring
-* Mobile optimization
+* Mobile responsiveness improvements
 
 ---
 
@@ -240,4 +265,4 @@ Planned improvements:
 
 This project is developed for educational and research purposes.
 
-All rights reserved.
+© FikryTech — All Rights Reserved.
